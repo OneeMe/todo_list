@@ -34,7 +34,15 @@ class MyApp extends StatelessWidget {
       },
       onGenerateRoute: (RouteSettings settings) {
         if (settings.name == REGISTER_PAGE_URL) {
-          return MaterialPageRoute(builder: (conetxt) => RegisterPage(settings.arguments));
+          return PageRouteBuilder(
+            pageBuilder: (conetxt, _, __) => RegisterPage(settings.arguments),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+          );
         }
       },
       onUnknownRoute: (RouteSettings settings) {
