@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:todo_list/config/colors.dart';
 
+import './pages/login.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -23,23 +25,7 @@ class MyApp extends StatelessWidget {
         const Locale('en'),
         const Locale('zh', 'CN'),
       ],
-      home: MyHomePage(title: 'Todo List'),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Center(child: Text('这即将是一个 Todo App')),
+      home: LoginPage(),
     );
   }
 }
