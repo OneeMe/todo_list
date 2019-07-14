@@ -4,6 +4,7 @@ import 'package:todo_list/config/colors.dart';
 import 'package:todo_list/pages/login.dart';
 import 'package:todo_list/pages/register.dart';
 import 'package:todo_list/pages/route_url.dart';
+import 'package:todo_list/pages/unknown_url_page.dart';
 
 
 void main() => runApp(MyApp());
@@ -30,7 +31,14 @@ class MyApp extends StatelessWidget {
       initialRoute: LOGIN_PAGE_URL,
       routes: {
         LOGIN_PAGE_URL: (conetxt) => LoginPage(),
-        REGISTER_PAGE_URL: (conetxt) => RegisterPage(),
+      },
+      onGenerateRoute: (RouteSettings settings) {
+        if (settings.name == REGISTER_PAGE_URL) {
+          return MaterialPageRoute(builder: (conetxt) => RegisterPage(settings.arguments));
+        }
+      },
+      onUnknownRoute: (RouteSettings settings) {
+        return MaterialPageRoute(builder: (context) => UnknownUrlPage(settings.name));
       },
     );
   }
