@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 
+import 'package:todo_list/pages/register.dart';
+import 'package:todo_list/pages/route_url.dart';
+
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -62,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
           'Content-Type': 'application/json',
         });
     Map<String, dynamic> body = JsonDecoder().convert(response.body);
-    print(body);
+
     Navigator.of(context).pop();
     showDialog(
         context: context,
@@ -173,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
                             Text('没有账号？'),
                             InkWell(
                               child: Text('立即注册'),
-                              onTap: () {},
+                              onTap: () => Navigator.of(context).pushNamed(REGISTER_PAGE_URL),
                             ),
                           ],
                         ),
