@@ -12,11 +12,15 @@ class _LoginPageState extends State<LoginPage> {
 
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  FocusNode emailFocusNode;
+  FocusNode passwordFocusNode;
 
   @override
   void initState() {
     super.initState();
     canLogin = false;
+    emailFocusNode = FocusNode();
+    passwordFocusNode = FocusNode();
   }
 
   void _checkInputValid(String _) {
@@ -80,8 +84,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    FocusNode emailFocusNode = FocusNode();
-    FocusNode passwordFocusNode = FocusNode();
     return Scaffold(
       body: GestureDetector(
         onTap: () {
@@ -126,6 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                               keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
                               onSubmitted: (String value) {
+                                emailFocusNode.unfocus();
                                 FocusScope.of(context)
                                     .requestFocus(passwordFocusNode);
                               },
