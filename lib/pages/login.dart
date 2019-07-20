@@ -139,10 +139,6 @@ class _LoginPageState extends State<LoginPage> {
                               decoration: InputDecoration(
                                 hintText: '请输入六位以上的密码',
                                 labelText: '密码',
-                                suffixIcon: FlatButton(
-                                  child: Text('忘记密码？'),
-                                  onPressed: () {},
-                                ),
                               ),
                               obscureText: true,
                               focusNode: passwordFocusNode,
