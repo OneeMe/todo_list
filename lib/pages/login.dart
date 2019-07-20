@@ -176,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
                             Text('没有账号？'),
                             InkWell(
                               child: Text('立即注册'),
-                              onTap: () => Navigator.of(context).pushNamed(REGISTER_PAGE_URL, arguments: RegisterPageArgument('LoginPage', LOGIN_PAGE_URL)),
+                              onTap: () => Navigator.of(context).pushReplacementNamed(REGISTER_PAGE_URL),
                             ),
                           ],
                         ),

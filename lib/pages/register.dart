@@ -4,17 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:todo_list/pages/route_url.dart';
 
-class RegisterPageArgument {
-  final String className;
-  final String url;
-
-  RegisterPageArgument(this.className, this.url);
-}
 
 class RegisterPage extends StatefulWidget {
-  final RegisterPageArgument argument;
-
-  RegisterPage(this.argument);
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
