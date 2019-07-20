@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:todo_list/config/colors.dart';
 
 void main() => runApp(MyApp());
-
-const int ThemeColor = 0xFF50D2C2;
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -10,9 +9,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primaryColor: Color(ThemeColor),
-        indicatorColor: Colors.white,
-        accentColor: Color(ThemeColor),
+        primaryColor: PRIMARY_COLOR,
+        indicatorColor: ACCENT_COLOR,
+        accentColor: PRIMARY_COLOR,
       ),
       home: MyHomePage(title: 'Todo List'),
     );
