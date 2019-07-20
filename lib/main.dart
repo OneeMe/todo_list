@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
           return FadePageRoute((_) => LoginPage());
         }
         if (settings.name == EDIT_TODO_PAGE_URL) {
-          return CupertinoPageRoute(builder: (_) => EditTodoPage(), fullscreenDialog: true);
+          return CupertinoPageRoute(builder: (_) => EditTodoPage(argument: settings.arguments), fullscreenDialog: true);
         }
       },
       onUnknownRoute: (RouteSettings settings) {

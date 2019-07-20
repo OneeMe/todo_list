@@ -1,12 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_list/components/delete_todo_dialog.dart';
 import 'package:todo_list/model/todo.dart';
+import 'package:todo_list/pages/route_url.dart';
 import 'package:todo_list/utils/generate_todo.dart';
 
 class TodoListPage extends StatefulWidget {
   const TodoListPage({Key key}) : super(key: key);
 
   @override
-  _TodoListPageState createState() => _TodoListPageState(generateTodos(100));
+  _TodoListPageState createState() => _TodoListPageState(generateTodos(5));
 }
 
 class _TodoListPageState extends State<TodoListPage> {
@@ -17,6 +20,10 @@ class _TodoListPageState extends State<TodoListPage> {
   @override
   void initState() {
     super.initState();
+    _sortTodoList();
+  }
+
+  void _sortTodoList() {
     todoList.sort((a, b) => a.compareWith(b));
   }
 
@@ -27,6 +34,37 @@ class _TodoListPageState extends State<TodoListPage> {
       itemBuilder: (context, index) {
         return TodoItem(
           todo: todoList[index],
+          key: Key(todoList[index].id),
+          onFinished: (Todo todo) {
+            setState(() {
+              todo.isFinished = !todo.isFinished;
+              _sortTodoList();
+            });
+          },
+          onStar: (Todo todo) {
+            setState(() {
+              todo.isStar = !todo.isStar;
+              _sortTodoList();
+            });
+          },
+          onTap: (Todo todo) {
+            Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL, arguments: EditTodoPageArgument(openType: OpenType.Preview, todo: todo));
+          },
+          onLongPress: (Todo todo) async {
+            bool result = await showCupertinoDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return DeleteTodoDialog(
+                  todo: todo,
+                );
+              }
+            );
+            if (result) {
+              setState(() {
+                todoList.remove(todo);
+              });
+            }
+          },
         );
       },
     );
@@ -42,8 +80,12 @@ const Map<Priority, Color> PRIORITY_COLOR = {
 
 class TodoItem extends StatelessWidget {
   final Todo todo;
+  final Function(Todo todo) onStar;
+  final Function(Todo todo) onFinished;
+  final Function(Todo todo) onTap;
+  final Function(Todo todo) onLongPress;
 
-  const TodoItem({Key key, this.todo}) : super(key: key);
+  const TodoItem({Key key, this.todo, this.onStar, this.onFinished, this.onTap, this.onLongPress}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -59,10 +101,13 @@ class TodoItem extends StatelessWidget {
       children: <Widget>[
         Row(
           children: <Widget>[
-            Image.asset(
-              todo.isFinished ? 'assets/images/rect_selected.png' : 'assets/images/rect.png',
-              width: 25,
-              height: 25,
+            GestureDetector(
+              onTap: () { onFinished(todo); },
+              child: Image.asset(
+                todo.isFinished ? 'assets/images/rect_selected.png' : 'assets/images/rect.png',
+                width: 25,
+                height: 25,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -73,10 +118,13 @@ class TodoItem extends StatelessWidget {
             ),
           ],
         ),
-        Container(
-          child: Image.asset(todo.isStar ? 'assets/images/star.png' : 'assets/images/star_normal.png'),
-          width: 25,
-          height: 25,
+        GestureDetector(
+          onTap: () { onStar(todo); },
+          child: Container(
+            child: Image.asset(todo.isStar ? 'assets/images/star.png' : 'assets/images/star_normal.png'),
+            width: 25,
+            height: 25,
+          ),
         ),
       ],
     );
@@ -96,25 +144,29 @@ class TodoItem extends StatelessWidget {
         )
       ],
     );
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          left: BorderSide(
-            width: 2,
-            color: PRIORITY_COLOR[todo.priority],
+    return GestureDetector(
+      onTap: () { onTap(todo); },
+      onLongPress: () => onLongPress(todo),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            left: BorderSide(
+              width: 2,
+              color: PRIORITY_COLOR[todo.priority],
+            ),
           ),
         ),
-      ),
-      margin: const EdgeInsets.all(10.0),
-      padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
-      height: 110,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          infoRow,
-          timeRow,
-        ],
+        margin: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
+        height: 110,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            infoRow,
+            timeRow,
+          ],
+        ),
       ),
     );
   }

@@ -33,7 +33,7 @@ class _TodoEntryState extends State<TodoEntryPage> {
   void onTabChange(int index) async {
     if (mounted) {
       if (index == 2) {
-        await Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL);
+        await Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL, arguments: EditTodoPageArgument(openType: OpenType.Add));
         index = 0;
       }
       setState(() {
