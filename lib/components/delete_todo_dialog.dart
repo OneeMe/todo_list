@@ -58,7 +58,8 @@ class DeleteTodoDialog extends Dialog {
           height: 15.0,
           width: 15.0,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(7.5)), color: Color.fromARGB(255, 80, 210, 194)),
+              borderRadius: BorderRadius.all(Radius.circular(7.5)),
+              color: Color.fromARGB(255, 80, 210, 194)),
         ),
         Container(
           child: Padding(
@@ -68,7 +69,10 @@ class DeleteTodoDialog extends Dialog {
               overflow: TextOverflow.ellipsis,
               softWrap: false,
               maxLines: 1,
-              style: TextStyle(color: Color.fromARGB(255, 74, 74, 74), fontSize: 18, fontFamily: 'Avenir'),
+              style: TextStyle(
+                  color: Color.fromARGB(255, 74, 74, 74),
+                  fontSize: 18,
+                  fontFamily: 'Avenir'),
             ),
           ),
         ),

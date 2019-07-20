@@ -23,6 +23,8 @@ class Todo {
   bool isFinished;
   /// 是否星标任务
   bool isStar;
+  /// 和 todo 所关联的地点
+  Location location;
 
   Todo({
     String id,
@@ -80,4 +82,21 @@ enum Priority {
   Low,
   Medium,
   High,
+}
+
+class Location {
+  /// 纬度
+  double latitude;
+  /// 经度
+  double longitude;
+  /// 地点描述
+  String description;
+
+  /// 默认的构造器
+  Location(this.longitude, this.latitude, {this.description});
+
+  /// 命名构造器，用于构造只有描述信息的 Location 对象
+  Location.fromDescription(this.description)
+      : latitude = null,
+        longitude = null;
 }
