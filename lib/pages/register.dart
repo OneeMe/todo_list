@@ -27,7 +27,9 @@ class _RegisterPageState extends State<RegisterPage> {
     confirmPasswordFocusNode = FocusNode();
   }
 
-  void _register() {}
+  void _register() {
+    Navigator.of(context).pushNamed(TODO_ENTRY_PAGE_URL);
+  }
 
   void _getImage() async {
     File image = await ImagePicker.pickImage(source: ImageSource.gallery);

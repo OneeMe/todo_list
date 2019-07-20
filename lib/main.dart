@@ -1,10 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:todo_list/config/colors.dart';
 import 'package:todo_list/page_route/fade_page_route.dart';
+import 'package:todo_list/pages/edit_todo.dart';
 import 'package:todo_list/pages/login.dart';
 import 'package:todo_list/pages/register.dart';
 import 'package:todo_list/pages/route_url.dart';
+import 'package:todo_list/pages/todo_entry.dart';
 import 'package:todo_list/pages/unknown_url_page.dart';
 
 
@@ -30,12 +33,18 @@ class MyApp extends StatelessWidget {
         const Locale('zh', 'CN'),
       ],
       initialRoute: LOGIN_PAGE_URL,
+      routes: {
+        TODO_ENTRY_PAGE_URL: (_) => TodoEntryPage(),
+      },
       onGenerateRoute: (RouteSettings settings) {
         if (settings.name == REGISTER_PAGE_URL) {
-          return FadePageRoute((context) => RegisterPage());
+          return FadePageRoute((_) => RegisterPage());
         }
         if (settings.name == LOGIN_PAGE_URL) {
-          return FadePageRoute((context) => LoginPage());
+          return FadePageRoute((_) => LoginPage());
+        }
+        if (settings.name == EDIT_TODO_PAGE_URL) {
+          return CupertinoPageRoute(builder: (_) => EditTodoPage(), fullscreenDialog: true);
         }
       },
       onUnknownRoute: (RouteSettings settings) {
