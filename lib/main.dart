@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:todo_list/config/colors.dart';
 
 void main() => runApp(MyApp());
@@ -13,6 +14,15 @@ class MyApp extends StatelessWidget {
         indicatorColor: ACCENT_COLOR,
         accentColor: PRIMARY_COLOR,
       ),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en'),
+        const Locale('zh', 'CN'),
+      ],
       home: MyHomePage(title: 'Todo List'),
     );
   }
