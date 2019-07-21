@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_list/components/delete_todo_dialog.dart';
-import 'package:todo_list/config/colors.dart';
 import 'package:todo_list/model/todo.dart';
+import 'package:todo_list/model/todo_list.dart';
 import 'package:todo_list/pages/route_url.dart';
 import 'package:todo_list/utils/generate_todo.dart';
 
@@ -14,24 +14,19 @@ class TodoListPage extends StatefulWidget {
 }
 
 class TodoListPageState extends State<TodoListPage> {
-  final List<Todo> _todoList;
+  final TodoList _todoList;
 
   TodoListPageState(this._todoList);
 
   @override
   void initState() {
     super.initState();
-    _sortTodoList();
   }
 
-  void _sortTodoList() {
-    _todoList.sort((a, b) => a.compareWith(b));
-  }
 
   void insertTodo(Todo todo) {
     setState(() {
-      _todoList.insert(0, todo);
-      _sortTodoList();
+      _todoList.add(todo);
     });
   }
 
@@ -41,18 +36,16 @@ class TodoListPageState extends State<TodoListPage> {
       itemCount: _todoList.length,
       itemBuilder: (context, index) {
         return TodoItem(
-          todo: _todoList[index],
-          key: Key(_todoList[index].id),
+          todo: _todoList.list[index],
+          key: Key(_todoList.list[index].id),
           onFinished: (Todo todo) {
             setState(() {
-              todo.isFinished = !todo.isFinished;
-              _sortTodoList();
+              _todoList.finshedAt(todo.id);
             });
           },
           onStar: (Todo todo) {
             setState(() {
-              todo.isStar = !todo.isStar;
-              _sortTodoList();
+              _todoList.starAt(todo.id);
             });
           },
           onTap: (Todo todo) async {
@@ -60,9 +53,7 @@ class TodoListPageState extends State<TodoListPage> {
             if (changedTodo == null) {
               return;
             }
-            int oldTodoIndex = _todoList.indexOf(todo);
-            _todoList.removeAt(oldTodoIndex);
-            insertTodo(changedTodo);
+            _todoList.updateTodo(todo.id, todo);
           },
           onLongPress: (Todo todo) async {
             bool result = await showCupertinoDialog(
@@ -75,7 +66,7 @@ class TodoListPageState extends State<TodoListPage> {
             );
             if (result) {
               setState(() {
-                _todoList.remove(todo);
+                _todoList.remove(todo.id);
               });
             }
           },
