@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:todo_list/config/colors.dart';
+import 'package:todo_list/model/todo.dart';
 import 'package:todo_list/page_route/fade_page_route.dart';
 import 'package:todo_list/pages/edit_todo.dart';
 import 'package:todo_list/pages/login.dart';
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
           return FadePageRoute((_) => LoginPage());
         }
         if (settings.name == EDIT_TODO_PAGE_URL) {
-          return CupertinoPageRoute(builder: (_) => EditTodoPage(argument: settings.arguments), fullscreenDialog: true);
+          return CupertinoPageRoute<Todo>(builder: (_) => EditTodoPage(argument: settings.arguments), fullscreenDialog: true);
         }
       },
       onUnknownRoute: (RouteSettings settings) {

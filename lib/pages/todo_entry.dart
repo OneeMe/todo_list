@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/config/colors.dart';
+import 'package:todo_list/model/todo.dart';
 import 'package:todo_list/pages/calendart.dart';
 import 'package:todo_list/pages/reporter.dart';
 import 'package:todo_list/pages/route_url.dart';
@@ -15,30 +16,39 @@ class TodoEntryPage extends StatefulWidget {
 class _TodoEntryState extends State<TodoEntryPage> {
   // List<Widget> childPages;
   int currentIndex;
+  final GlobalKey<TodoListPageState> _todoListStateKey = GlobalKey<TodoListPageState>();
+  List<TabConfig> _tabConfigs;
 
-  final List<TabConfig> tabConfigs = [
-    TabConfig(title: '你的清单', page: TodoListPage(), imagePath: 'assets/images/lists.png'),
-    TabConfig(title: '日历', page: CalendarPage(), imagePath: 'assets/images/calendar.png'),
-    TabConfig(title: '', page: Container(), imagePath: 'assets/images/add.png', size: 50, singleImage: true),
-    TabConfig(title: '任务回顾', page: ReporterPage(), imagePath: 'assets/images/report.png'),
-    TabConfig(title: '设置', page: SettingsPage(), imagePath: 'assets/images/settings.png'),
-  ];
 
   @override
   void initState() {
     super.initState();
     currentIndex = 0;
+    _tabConfigs = [
+      TabConfig(title: '你的清单', page: TodoListPage(key: _todoListStateKey), imagePath: 'assets/images/lists.png'),
+      TabConfig(title: '日历', page: CalendarPage(), imagePath: 'assets/images/calendar.png'),
+      TabConfig(title: '', page: Container(), imagePath: 'assets/images/add.png', size: 50, singleImage: true),
+      TabConfig(title: '任务回顾', page: ReporterPage(), imagePath: 'assets/images/report.png'),
+      TabConfig(title: '设置', page: SettingsPage(), imagePath: 'assets/images/settings.png'),
+    ];
   }
 
   void onTabChange(int index) async {
     if (mounted) {
       if (index == 2) {
-        await Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL, arguments: EditTodoPageArgument(openType: OpenType.Add));
-        index = 0;
+        Todo todo = await Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL, arguments: EditTodoPageArgument(openType: OpenType.Add));
+        if (todo != null) {
+          _todoListStateKey.currentState.insertTodo(todo);
+          index = 0;
+        } else {
+          index = currentIndex;
+        }
       }
-      setState(() {
-        currentIndex = index;
-      });
+      if (currentIndex != index) {
+        setState(() {
+          currentIndex = index;
+        });
+      }
     }
   }
 
@@ -47,11 +57,11 @@ class _TodoEntryState extends State<TodoEntryPage> {
     return Scaffold(
        body: IndexedStack(
          index: currentIndex,
-         children: tabConfigs.map((config) => config.page).toList()
+         children: _tabConfigs.map((config) => config.page).toList()
        ),
       //  body: childPages[currentIndex],
        appBar: AppBar(
-         title: Text(tabConfigs[currentIndex].title),
+         title: Text(_tabConfigs[currentIndex].title),
          automaticallyImplyLeading: false,
          backgroundColor: BACKGROUND_COLOR,
          centerTitle: true,
@@ -60,7 +70,7 @@ class _TodoEntryState extends State<TodoEntryPage> {
          onTap: onTabChange,
          currentIndex: currentIndex,
          type: BottomNavigationBarType.fixed,
-         items: tabConfigs.map((config) => config.navigationBarItem).toList(),
+         items: _tabConfigs.map((config) => config.navigationBarItem).toList(),
        ),
     );
   }

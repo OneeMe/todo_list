@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_list/components/delete_todo_dialog.dart';
+import 'package:todo_list/config/colors.dart';
 import 'package:todo_list/model/todo.dart';
 import 'package:todo_list/pages/route_url.dart';
 import 'package:todo_list/utils/generate_todo.dart';
@@ -9,13 +10,13 @@ class TodoListPage extends StatefulWidget {
   const TodoListPage({Key key}) : super(key: key);
 
   @override
-  _TodoListPageState createState() => _TodoListPageState(generateTodos(5));
+  TodoListPageState createState() => TodoListPageState(generateTodos(5));
 }
 
-class _TodoListPageState extends State<TodoListPage> {
-  final List<Todo> todoList;
+class TodoListPageState extends State<TodoListPage> {
+  final List<Todo> _todoList;
 
-  _TodoListPageState(this.todoList);
+  TodoListPageState(this._todoList);
 
   @override
   void initState() {
@@ -24,17 +25,24 @@ class _TodoListPageState extends State<TodoListPage> {
   }
 
   void _sortTodoList() {
-    todoList.sort((a, b) => a.compareWith(b));
+    _todoList.sort((a, b) => a.compareWith(b));
+  }
+
+  void insertTodo(Todo todo) {
+    setState(() {
+      _todoList.insert(0, todo);
+      _sortTodoList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: todoList.length,
+      itemCount: _todoList.length,
       itemBuilder: (context, index) {
         return TodoItem(
-          todo: todoList[index],
-          key: Key(todoList[index].id),
+          todo: _todoList[index],
+          key: Key(_todoList[index].id),
           onFinished: (Todo todo) {
             setState(() {
               todo.isFinished = !todo.isFinished;
@@ -47,8 +55,14 @@ class _TodoListPageState extends State<TodoListPage> {
               _sortTodoList();
             });
           },
-          onTap: (Todo todo) {
-            Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL, arguments: EditTodoPageArgument(openType: OpenType.Preview, todo: todo));
+          onTap: (Todo todo) async {
+            Todo changedTodo = await Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL, arguments: EditTodoPageArgument(openType: OpenType.Preview, todo: todo));
+            if (changedTodo == null) {
+              return;
+            }
+            int oldTodoIndex = _todoList.indexOf(todo);
+            _todoList.removeAt(oldTodoIndex);
+            insertTodo(changedTodo);
           },
           onLongPress: (Todo todo) async {
             bool result = await showCupertinoDialog(
@@ -61,7 +75,7 @@ class _TodoListPageState extends State<TodoListPage> {
             );
             if (result) {
               setState(() {
-                todoList.remove(todo);
+                _todoList.remove(todo);
               });
             }
           },

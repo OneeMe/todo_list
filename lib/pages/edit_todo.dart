@@ -31,6 +31,7 @@ class _EditTodoPageState extends State<EditTodoPage> {
   final TextEditingController _dateTextController = TextEditingController();
   final TextEditingController _endTimeTextController = TextEditingController();
   final GlobalKey _priorityContainerKey = GlobalKey();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final EdgeInsetsGeometry _padding = const EdgeInsets.fromLTRB(20, 10, 20, 20);
   final TextStyle _titleStyle =
@@ -50,7 +51,10 @@ class _EditTodoPageState extends State<EditTodoPage> {
   }
 
   void _submit() {
-    Navigator.of(context).pop();
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      Navigator.of(context).pop(_todo);
+    }
   }
 
   @override
