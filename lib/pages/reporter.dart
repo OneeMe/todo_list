@@ -33,7 +33,10 @@ class _ReporterPageState extends State<ReporterPage> {
   int _handlingTaskCount = 32;
   int _delayedTaskCount = 12;
 
-  List<Todo> _tasks = [];
+  List<Todo> _tasksOfThisMonth = [];
+  List<Todo> _tasksToShow = [];
+
+  TaskStatus _showedStatus = null;
 
   @override
   void initState() {
@@ -45,7 +48,9 @@ class _ReporterPageState extends State<ReporterPage> {
     _finishedTaskCount = 0;
     _handlingTaskCount = 0;
     _delayedTaskCount = 0;
-    _tasks.clear();
+    _tasksOfThisMonth.clear();
+    _tasksToShow = null;
+    _showedStatus = null;
   }
 
   /// month: [1..12]
@@ -56,7 +61,7 @@ class _ReporterPageState extends State<ReporterPage> {
         return;
       }
       if (todo.date != null && todo.date.month == month) {
-        _tasks.add(todo);
+        _tasksOfThisMonth.add(todo);
         TaskStatus status = todo.status;
         if (status == TaskStatus.finished) {
           _finishedTaskCount += 1;
@@ -69,8 +74,23 @@ class _ReporterPageState extends State<ReporterPage> {
         }
       }
     });
-    _tasks.sort((a, b) => a.compareWith(b));
+    _tasksOfThisMonth.sort((a, b) => a.compareWith(b));
+    _computeByTaskStatus(null);
     this.setState(() {});
+  }
+
+  void _computeByTaskStatus(TaskStatus status) {
+    if (_showedStatus == status && _tasksToShow != null) {
+      return;
+    }
+    if (status == null) {
+      _tasksToShow = _tasksOfThisMonth;
+    } else {
+      _tasksToShow = _tasksOfThisMonth.where((t) => t.status == status).toList();
+    }
+    this.setState(() {
+      _showedStatus = status;
+    });
   }
 
   @override
@@ -139,9 +159,9 @@ class _ReporterPageState extends State<ReporterPage> {
 
   Widget _buildTaskListArea() {
     return ListView.builder(
-      itemCount: _tasks.length,
+      itemCount: _tasksToShow.length,
       itemBuilder: (context, index) {
-        Todo task = _tasks[index];
+        Todo task = _tasksToShow[index];
         return Column(
           children: <Widget>[
             Row(
@@ -184,12 +204,23 @@ class _ReporterPageState extends State<ReporterPage> {
     if (status == null) {
       status = TaskStatus.handling;
     }
-    return Column(
-      children: <Widget>[
-        Text(status.description, style: TextStyle(fontSize: 16)),
-        Text(count.toString(), style: TextStyle(fontSize: 33)),
-        Container(color: status.color, height: 10, width: 10, margin: EdgeInsets.all(10),)
-      ],
+    return Expanded(
+      flex: 1,
+      child: GestureDetector(
+        child: Container(
+          color: _showedStatus == status ? Colors.lightGreen : Colors.transparent,
+          child: Column(
+            children: <Widget>[
+              Text(status.description, style: TextStyle(fontSize: 16)),
+              Text(count.toString(), style: TextStyle(fontSize: 33)),
+              Container(color: status.color, height: 10, width: 10, margin: EdgeInsets.all(10),)
+            ],
+          )
+        ),
+        onTap: () {
+          _computeByTaskStatus(status == _showedStatus ? null : status);
+        },
+      )
     );
   }
 }
