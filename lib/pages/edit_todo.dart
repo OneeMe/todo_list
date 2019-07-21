@@ -88,6 +88,21 @@ class _EditTodoPageState extends State<EditTodoPage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _taskNameFocusNode.dispose();
+    _taskDescFocusNode.dispose();
+    _taskNameController.dispose();
+    _taskDescController.dispose();
+    _dateController.dispose();
+    _startTimeController.dispose();
+    _endTimeController.dispose();
+    _startTimeTextController.dispose();
+    _dateTextController.dispose();
+    _endTimeTextController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
