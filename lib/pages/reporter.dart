@@ -167,7 +167,7 @@ class _ReporterPageState extends State<ReporterPage> {
   }
 
   Widget _buildColouredStripe(double percentage, Color color) {
-    if (percentage == null || percentage < 0) {
+    if (percentage == null || percentage < 0 || percentage.isNaN) {
       return EmptyWidget();
     }
     return SizedBox(
