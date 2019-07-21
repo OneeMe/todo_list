@@ -6,6 +6,7 @@ import 'package:todo_list/pages/reporter.dart';
 import 'package:todo_list/pages/route_url.dart';
 import 'package:todo_list/pages/settings.dart';
 import 'package:todo_list/pages/todo_list.dart';
+import 'package:todo_list/utils/generate_todo.dart';
 
 class TodoEntryPage extends StatefulWidget {
   TodoEntryPage({Key key}) : super(key: key);
@@ -28,7 +29,7 @@ class _TodoEntryState extends State<TodoEntryPage> {
       TabConfig(title: '你的清单', page: TodoListPage(key: _todoListStateKey), imagePath: 'assets/images/lists.png'),
       TabConfig(title: '日历', page: CalendarPage(), imagePath: 'assets/images/calendar.png'),
       TabConfig(title: '', page: Container(), imagePath: 'assets/images/add.png', size: 50, singleImage: true),
-      TabConfig(title: '任务回顾', page: ReporterPage(), imagePath: 'assets/images/report.png'),
+      TabConfig(title: '任务回顾', page: ReporterPage(tasks: generateTodos(100)), imagePath: 'assets/images/report.png'),
       TabConfig(title: '设置', page: SettingsPage(), imagePath: 'assets/images/settings.png'),
     ];
   }
