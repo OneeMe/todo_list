@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:todo_list/utils/date_time.dart';
 import 'package:uuid/uuid.dart';
 
@@ -8,10 +9,12 @@ class Todo {
   String title;
   /// 描述
   String description;
+  /// 日期
+  DateTime date;
   /// 开始时间
-  DateTime startTime;
+  TimeOfDay startTime;
   /// 结束时间
-  DateTime endTime;
+  TimeOfDay endTime;
   /// 优先级
   Priority priority;
   /// 提醒时间
@@ -25,19 +28,17 @@ class Todo {
     String id,
     this.title = "",
     this.description = "",
-    this.startTime,
-    this.endTime,
+    this.date,
+    this.startTime = const TimeOfDay(hour: 0, minute: 0),
+    this.endTime = const TimeOfDay(hour: 0, minute: 0),
     this.priority = Priority.Unspecificed, // 优先级越小优先级越高
     this.notifyTime = const Duration(),
     this.isFinished = false,
     this.isStar = false,
   }) : this.id = id ?? generateNewId() {
     // 如果开始时间为空，则设置为当前时间
-    if (startTime == null) {
-      startTime = DateTime.now();
-    }
-    if (endTime == null) {
-      endTime = startTime;
+    if (date == null) {
+      date = today();
     }
   }
 
@@ -47,10 +48,10 @@ class Todo {
 
   String get timeString {
     DateTime now = DateTime.now();
-    if (isSameDay(now, startTime) && isSameDay(now, endTime)) {
-      return '${startTime.hour}:${startTime.minute} - ${endTime.hour}:${endTime.minute}';
+    if (isSameDay(now, date)) {
+      return '${date.hour}:${date.minute} - ${endTime.hour}:${endTime.minute}';
     }
-    return '${endTime.year}/${endTime.month}/${endTime.day}';
+    return '${date.year}/${date.month}/${date.day}';
   }
 
   int compareWith(Todo todo) {
@@ -66,7 +67,11 @@ class Todo {
     if (this.isStar && !todo.isStar) {
       return -1;
     }
-    return todo.endTime.compareTo(this.endTime);
+    int dateCompareResult = todo.date.compareTo(this.date);
+    if (dateCompareResult != 0) {
+      return dateCompareResult;
+    }
+    return endTime.hour - todo.endTime.hour;
   }
 }
 
