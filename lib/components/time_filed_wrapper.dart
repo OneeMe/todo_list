@@ -34,8 +34,9 @@ class TimeFieldWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      child: child,
-      behavior: HitTestBehavior.translucent,
+      child: AbsorbPointer(
+        child: child,
+      ),
       onTap: () async {
         TimeOfDay timeOfDay = await showTimePicker(
           context: context,

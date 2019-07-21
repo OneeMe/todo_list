@@ -30,6 +30,7 @@ class _EditTodoPageState extends State<EditTodoPage> {
       TextEditingController();
   final TextEditingController _dateTextController = TextEditingController();
   final TextEditingController _endTimeTextController = TextEditingController();
+  final GlobalKey _priorityContainerKey = GlobalKey();
 
   final EdgeInsetsGeometry _padding = const EdgeInsets.fromLTRB(20, 10, 20, 20);
   final TextStyle _titleStyle =
@@ -52,17 +53,15 @@ class _EditTodoPageState extends State<EditTodoPage> {
     Navigator.of(context).pop();
   }
 
-  void _save() {}
-
   @override
   void initState() {
     super.initState();
     _openType = widget.argument.openType;
-    _todo = widget.argument.todo;
+    _todo = widget.argument.todo ?? Todo();
     _openTypeConfigMap = {
       OpenType.Preview: OpenTypeConfig('查看 TODO', Icons.edit, _edit),
       OpenType.Edit: OpenTypeConfig('编辑 TODO', Icons.check, _submit),
-      OpenType.Add: OpenTypeConfig('添加 TODO', Icons.check, _save),
+      OpenType.Add: OpenTypeConfig('添加 TODO', Icons.check, _submit),
     };
     _dateController.addListener(() {
       _dateTextController.text = formatAsChineseDate(_dateController.date);
@@ -115,28 +114,42 @@ class _EditTodoPageState extends State<EditTodoPage> {
             // 触摸收起键盘
             FocusScope.of(context).unfocus();
           },
-          child: Column(
-            children: <Widget>[
-              _buildInputTextLine('名称', '任务名称', _taskNameFocusNode,
-                  maxLines: 1, controller: _taskNameController),
-              _buildInputTextLine('描述', '任务描述', _taskDescFocusNode,
-                  controller: _taskDescController),
-              _buildDatePicker(
-                  '日期', '请选择日期', _dateController, _dateTextController),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Expanded(
-                    child: _buildTimePicker('开始时间', '请选择开始时间',
-                        _startTimeController, _startTimeTextController),
-                  ),
-                  Expanded(
-                    child: _buildTimePicker('终止时间', '请选择终止时间',
-                        _endTimeController, _endTimeTextController),
-                  ),
-                ],
-              ),
-            ],
+          child: Form(
+            key: _formKey,
+            autovalidate: true,
+            child: Column(
+              children: <Widget>[
+                _buildInputTextLine('名称', '任务名称', _taskNameFocusNode,
+                    maxLines: 1,
+                    controller: _taskNameController,
+                    onSaved: (value) => _todo.title = value),
+                _buildInputTextLine('描述', '任务描述', _taskDescFocusNode,
+                    controller: _taskDescController,
+                    onSaved: (value) => _todo.description = value),
+                _buildDatePicker('日期', '请选择日期',
+                    dateController: _dateController,
+                    textController: _dateTextController,
+                    onSaved: (value) => _todo.date = value),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      child: _buildTimePicker('开始时间', '请选择开始时间',
+                          timeController: _startTimeController,
+                          textController: _startTimeTextController,
+                          onSaved: (value) => _todo.startTime = value),
+                    ),
+                    Expanded(
+                      child: _buildTimePicker('终止时间', '请选择终止时间',
+                          timeController: _endTimeController,
+                          textController: _endTimeTextController,
+                          onSaved: (value) => _todo.endTime = value),
+                    ),
+                  ],
+                ),
+                _buildPriorityWidget(),
+              ],
+            ),
           ),
         ),
       ),
@@ -144,15 +157,21 @@ class _EditTodoPageState extends State<EditTodoPage> {
   }
 
   Widget _buildInputTextLine(String title, String hintText, FocusNode focusNode,
-      {int maxLines, TextEditingController controller}) {
+      {int maxLines,
+      TextEditingController controller,
+      FormFieldSetter<String> onSaved}) {
     TextInputType inputType =
         maxLines == null ? TextInputType.multiline : TextInputType.text;
     return LabeledField(
       labelText: title,
       labelStyle: _titleStyle,
       padding: _padding,
-      child: TextField(
+      child: TextFormField(
         keyboardType: inputType,
+        validator: (String value) {
+          return value.length > 0 ? null : '$title 不能为空';
+        },
+        onSaved: onSaved,
         textInputAction: TextInputAction.done,
         focusNode: focusNode,
         maxLines: maxLines,
@@ -166,23 +185,28 @@ class _EditTodoPageState extends State<EditTodoPage> {
   }
 
   Widget _buildDatePicker(
-      String title,
-      String hintText,
-      DateFieldController dateController,
-      TextEditingController textController) {
+    String title,
+    String hintText, {
+    DateFieldController dateController,
+    TextEditingController textController,
+    Function(DateTime) onSaved,
+  }) {
     DateTime now = DateTime.now();
     return LabeledField(
       labelText: title,
       labelStyle: _titleStyle,
       padding: _padding,
       child: DateFieldWrapper(
-        child: TextField(
+        child: TextFormField(
           controller: textController,
           decoration: InputDecoration(
             hintText: hintText,
             disabledBorder: _border,
           ),
-          enabled: false,
+          validator: (String value) {
+            return dateController.date == null ? '$title 不能为空' : null;
+          },
+          onSaved: (_) => onSaved(dateController.date),
         ),
         controller: dateController,
         initialDate: now,
@@ -193,27 +217,130 @@ class _EditTodoPageState extends State<EditTodoPage> {
   }
 
   Widget _buildTimePicker(
-      String title,
-      String hintText,
-      TimeFieldController timeController,
-      TextEditingController textController) {
+    String title,
+    String hintText, {
+    TimeFieldController timeController,
+    TextEditingController textController,
+    Function(TimeOfDay) onSaved,
+  }) {
     return LabeledField(
       labelText: title,
       labelStyle: _titleStyle,
       padding: _padding,
       child: TimeFieldWrapper(
-        child: TextField(
+        child: TextFormField(
           controller: textController,
           decoration: InputDecoration(
             hintText: hintText,
             disabledBorder: _border,
           ),
-          enabled: false,
+          validator: (String value) {
+            return timeController.time == null ? '$title 不能为空' : null;
+          },
+          onSaved: (_) => onSaved(timeController.time),
         ),
         controller: timeController,
         initialTime: TimeOfDay.now(),
       ),
     );
+  }
+
+  Widget _buildPriorityWidget() {
+    return LabeledField(
+      labelText: '优先级',
+      labelStyle: _titleStyle,
+      padding: _padding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  child: Text(_todo.priority.description),
+                ),
+                GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: _showPriorityMenu,
+                  child: Container(
+                    width: 100,
+                    height: 50,
+                    alignment: Alignment.center,
+                    child: Container(
+                      key: _priorityContainerKey,
+                      width: 100,
+                      height: 5,
+                      color: _todo.priority.color,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+            color: Colors.black26,
+            height: 0.5,
+          )
+        ],
+      ),
+    );
+  }
+
+  void _showPriorityMenu() async {
+    /// 弹出优先级选择菜单
+    Priority priority = await showMenu<Priority>(
+      context: context,
+      position: _getMenuPosition(context),
+      // 将Priority的所有值列表映射为PriorityPopupMenuItem列表
+      items:
+          Priority.values.map((e) => _buildPriorityPopupMenuItem(e)).toList(),
+    );
+    if (priority == null) return;
+
+    /// 将优先级值对应的Priority对象赋值给_priority
+    this.setState(() {
+      _todo.priority = priority;
+    });
+  }
+
+  PopupMenuItem<Priority> _buildPriorityPopupMenuItem(Priority priority) {
+    return PopupMenuItem<Priority>(
+      value: priority,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(priority.description),
+          Container(
+            width: 100,
+            height: 5,
+            color: priority.color,
+          )
+        ],
+      ),
+    );
+  }
+
+  RelativeRect _getMenuPosition(BuildContext context) {
+    /// 获取优先级展示框的色块的Container对象锁对应的RenderBox对象
+    final RenderBox renderBox =
+        _priorityContainerKey.currentContext.findRenderObject();
+
+    /// 获取当前上下文中图层对象
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+
+    /// 将色块的右下角的坐标转换为全局坐标
+    final Offset startPoint = renderBox.localToGlobal(
+        Offset(renderBox.size.width, renderBox.size.height),
+        ancestor: overlay);
+
+    /// 构造色块右下角位置所对应的RelativeRect对象
+    return RelativeRect.fromSize(
+        Rect.fromLTRB(
+            startPoint.dx, startPoint.dy, startPoint.dx, startPoint.dy),
+        overlay.size);
   }
 }
 

@@ -59,9 +59,9 @@ class DateFieldWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      child: child,
-      behavior: HitTestBehavior.translucent,
-
+      child: AbsorbPointer(
+        child: child,
+      ),
       /// 当点击 child 组件的时候会弹出日期选择对话框
       onTap: () async {
         DateTime date = controller.date ?? initialDate;

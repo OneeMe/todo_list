@@ -4,8 +4,8 @@ import 'package:todo_list/model/todo.dart';
 
 List<Todo> generateTodos(int length) {
   List<Priority> priorities = [
-    Priority.Unspecificed,
-    Priority.Low,
+    Priority.Unspecific,
+    Priority.Medium,
     Priority.Medium,
     Priority.High,
   ];

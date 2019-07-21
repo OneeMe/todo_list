@@ -71,13 +71,6 @@ class _TodoListPageState extends State<TodoListPage> {
   }
 }
 
-const Map<Priority, Color> PRIORITY_COLOR = {
-  Priority.Unspecificed: Colors.transparent,
-  Priority.Low: Color.fromARGB(255, 80, 210, 194),
-  Priority.Medium: Color.fromARGB(255, 251, 156, 53),
-  Priority.High: Color.fromARGB(255, 228, 74, 77),
-};
-
 class TodoItem extends StatelessWidget {
   final Todo todo;
   final Function(Todo todo) onStar;
@@ -153,7 +146,7 @@ class TodoItem extends StatelessWidget {
           border: Border(
             left: BorderSide(
               width: 2,
-              color: PRIORITY_COLOR[todo.priority],
+              color: todo.priority.color,
             ),
           ),
         ),
