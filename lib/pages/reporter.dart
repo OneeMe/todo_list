@@ -36,7 +36,7 @@ class _ReporterPageState extends State<ReporterPage> {
   List<Todo> _tasksOfThisMonth = [];
   List<Todo> _tasksToShow = [];
 
-  TaskStatus _showedStatus = null;
+  TaskStatus _showedStatus;
 
   @override
   void initState() {
