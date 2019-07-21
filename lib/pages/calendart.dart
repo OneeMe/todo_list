@@ -13,13 +13,13 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
 
+  Map<DateTime, List<Todo>> _visibleEvents;
   List<Todo> _tasksToShow = [];
 
   @override
   void initState() {
     super.initState();
-    _tasksToShow = widget.tasks;
-    _compute(DateTime.now());
+    _compute();
   }
 
   @override
@@ -29,25 +29,13 @@ class _CalendarPageState extends State<CalendarPage> {
         TableCalendar(
           locale: 'zh_CN',
           // headerVisible: false,
+          events: _visibleEvents,
           headerStyle: HeaderStyle(),
           onDaySelected: (DateTime day, List events) {
-            _compute(day);
+            this.setState(() {
+              _tasksToShow = events;
+            });
           },
-          // builders: CalendarBuilders(
-          //   markersBuilder: (context, date, events, holidays) {
-          //       final children = <Widget>[];
-          //       if (events.isNotEmpty) {
-          //         children.add(
-          //           Positioned(
-          //             right: 1,
-          //             bottom: 1,
-          //             child: _buildEventsMarker(date, events),
-          //           ),
-          //         );
-          //       }
-          //       return children;
-          //   }
-          // )
         ),
         Expanded(
           child: _buildTaskListArea(),
@@ -57,18 +45,19 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  void _compute(DateTime day) {
-    _tasksToShow.clear();
+  void _compute() {
+    _visibleEvents = {};
     widget.tasks.forEach((todo) {
       if (todo == null) {
         return;
       }
-      if (todo.date != null && todo.date == day) {
-        _tasksToShow.add(todo);
+      List<Todo> value = _visibleEvents[todo.date];
+      if (value == null) {
+        value = [];
+        _visibleEvents[todo.date] = value; 
       }
+      value.add(todo);
     });
-    _tasksToShow.sort((a, b) => a.compareWith(b));
-    this.setState(() {});
   }
 
   Widget _buildTaskListArea() {
