@@ -1,6 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:todo_list/model/todo.dart';
 
-class TodoList {
+class TodoList with ChangeNotifier {
   final List<Todo> _todoList;
 
   TodoList(this._todoList) {
@@ -13,10 +14,12 @@ class TodoList {
   void add(Todo todo) {
     _todoList.add(todo);
     _sort();
+    notifyListeners();
   }
 
   void remove(String id) {
     _todoList.removeWhere((todo) => todo.id == id);
+    notifyListeners();
   }
 
   void _sort() {
@@ -35,6 +38,7 @@ class TodoList {
     }
     todo.isFinished = !todo.isFinished;
     _sort();
+    notifyListeners();
     return true;
   }
 
@@ -45,6 +49,7 @@ class TodoList {
     }
     todo.isStar = !todo.isStar;
     _sort();
+    notifyListeners();
     return true;
   }
 
@@ -55,6 +60,7 @@ class TodoList {
     }
     _todoList.remove(oldTodo);
     add(todo);
+    notifyListeners();
     return true;
   }
 }

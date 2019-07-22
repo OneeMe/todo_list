@@ -7,10 +7,13 @@ import 'package:todo_list/pages/route_url.dart';
 import 'package:todo_list/utils/generate_todo.dart';
 
 class TodoListPage extends StatefulWidget {
-  const TodoListPage({Key key}) : super(key: key);
+
+  final TodoList todoList;
+
+  const TodoListPage({Key key, this.todoList}) : super(key: key);
 
   @override
-  TodoListPageState createState() => TodoListPageState(generateTodos(5));
+  TodoListPageState createState() => TodoListPageState(todoList);
 }
 
 class TodoListPageState extends State<TodoListPage> {

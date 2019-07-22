@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_list/components/scroll_option_view.dart';
 import 'package:todo_list/model/todo.dart';
+import 'package:todo_list/model/todo_list.dart';
 import 'package:todo_list/utils/utils.dart';
 
 final List<String> months = [
@@ -20,9 +22,7 @@ final List<String> months = [
 
 class ReporterPage extends StatefulWidget {
 
-  final List<Todo> tasks;
-
-  ReporterPage({Key key, this.tasks}): assert(tasks != null), super(key: key);
+  ReporterPage({Key key}) : super(key: key);
 
   @override
   _ReporterPageState createState() => _ReporterPageState();
@@ -37,11 +37,13 @@ class _ReporterPageState extends State<ReporterPage> {
   List<Todo> _tasksToShow = [];
 
   TaskStatus _showedStatus;
+  int currentMonth;
 
   @override
   void initState() {
     super.initState();
-    _compute(1);
+    currentMonth = 1;
+//    _compute(1);
   }
 
   void _reset() {
@@ -54,9 +56,9 @@ class _ReporterPageState extends State<ReporterPage> {
   }
 
   /// month: [1..12]
-  void _compute(int month) {
+  void _compute(TodoList todoList, int month) {
     _reset();
-    widget.tasks.forEach((todo) {
+    todoList.list.forEach((todo) {
       if (todo == null) {
         return;
       }
@@ -76,7 +78,6 @@ class _ReporterPageState extends State<ReporterPage> {
     });
     _tasksOfThisMonth.sort((a, b) => a.compareWith(b));
     _computeByTaskStatus(null);
-    this.setState(() {});
   }
 
   void _computeByTaskStatus(TaskStatus status) {
@@ -88,13 +89,14 @@ class _ReporterPageState extends State<ReporterPage> {
     } else {
       _tasksToShow = _tasksOfThisMonth.where((t) => t.status == status).toList();
     }
-    this.setState(() {
-      _showedStatus = status;
-    });
+    _showedStatus = status;
   }
 
   @override
   Widget build(BuildContext context) {
+    TodoList todoList = Provider.of<TodoList>(context);
+    _compute(todoList, currentMonth);
+
     return Scaffold(
       body: Column(
         children: <Widget>[
@@ -103,7 +105,10 @@ class _ReporterPageState extends State<ReporterPage> {
             child: ScrollOptionView(
               options: months,
               onOptionChanged: (context, option, index) {
-                this._compute(index + 1);
+                this.setState(() {
+                  currentMonth = index + 1;
+                });
+//                this._compute(todoList, index + 1);
               },
             )
           ),

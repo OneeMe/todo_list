@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_list/config/colors.dart';
 import 'package:todo_list/model/todo.dart';
+import 'package:todo_list/model/todo_list.dart';
 import 'package:todo_list/pages/calendart.dart';
 import 'package:todo_list/pages/reporter.dart';
 import 'package:todo_list/pages/route_url.dart';
@@ -19,17 +21,19 @@ class _TodoEntryState extends State<TodoEntryPage> {
   int currentIndex;
   final GlobalKey<TodoListPageState> _todoListStateKey = GlobalKey<TodoListPageState>();
   List<TabConfig> _tabConfigs;
+  TodoList todoList;
 
 
   @override
   void initState() {
     super.initState();
     currentIndex = 0;
+    todoList = generateTodos(10);
     _tabConfigs = [
-      TabConfig(title: '你的清单', page: TodoListPage(key: _todoListStateKey), imagePath: 'assets/images/lists.png'),
-      TabConfig(title: '日历', page: CalendarPage(tasks: generateTodos(100)), imagePath: 'assets/images/calendar.png'),
+      TabConfig(title: '你的清单', page: TodoListPage(key: _todoListStateKey, todoList: todoList,), imagePath: 'assets/images/lists.png'),
+      TabConfig(title: '日历', page: CalendarPage(tasks: generateTodos(100).list), imagePath: 'assets/images/calendar.png'),
       TabConfig(title: '', page: Container(), imagePath: 'assets/images/add.png', size: 50, singleImage: true),
-      TabConfig(title: '任务回顾', page: ReporterPage(tasks: generateTodos(100)), imagePath: 'assets/images/report.png'),
+      TabConfig(title: '任务回顾', page: ReporterPage(), imagePath: 'assets/images/report.png'),
       TabConfig(title: '设置', page: SettingsPage(), imagePath: 'assets/images/settings.png'),
     ];
   }
@@ -55,24 +59,27 @@ class _TodoEntryState extends State<TodoEntryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-       body: IndexedStack(
-         index: currentIndex,
-         children: _tabConfigs.map((config) => config.page).toList()
-       ),
-      //  body: childPages[currentIndex],
-       appBar: AppBar(
-         title: Text(_tabConfigs[currentIndex].title),
-         automaticallyImplyLeading: false,
-         backgroundColor: BACKGROUND_COLOR,
-         centerTitle: true,
-       ),
-       bottomNavigationBar: BottomNavigationBar(
-         onTap: onTabChange,
-         currentIndex: currentIndex,
-         type: BottomNavigationBarType.fixed,
-         items: _tabConfigs.map((config) => config.navigationBarItem).toList(),
-       ),
+    return ChangeNotifierProvider<TodoList>.value(
+      value: todoList,
+      child: Scaffold(
+        body: IndexedStack(
+            index: currentIndex,
+            children: _tabConfigs.map((config) => config.page).toList()
+        ),
+        //  body: childPages[currentIndex],
+        appBar: AppBar(
+          title: Text(_tabConfigs[currentIndex].title),
+          automaticallyImplyLeading: false,
+          backgroundColor: BACKGROUND_COLOR,
+          centerTitle: true,
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          onTap: onTabChange,
+          currentIndex: currentIndex,
+          type: BottomNavigationBarType.fixed,
+          items: _tabConfigs.map((config) => config.navigationBarItem).toList(),
+        ),
+      )
     );
   }
 }
