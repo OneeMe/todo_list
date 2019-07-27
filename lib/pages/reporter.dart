@@ -123,7 +123,7 @@ class _ReporterPageState extends State<ReporterPage> {
           Expanded(
             flex: 1,
             child: Padding(
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Column(
                 children: <Widget>[
                   Expanded(child: _buildTaskListArea(), flex: 1),

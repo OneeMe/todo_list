@@ -31,6 +31,10 @@ class _CalendarPageState extends State<CalendarPage> {
           // headerVisible: false,
           events: _visibleEvents,
           headerStyle: HeaderStyle(),
+          calendarStyle: CalendarStyle(
+            todayColor: Colors.transparent,
+            todayStyle: TextStyle(color: Colors.black)
+          ),
           onDaySelected: (DateTime day, List events) {
             this.setState(() {
               _tasksToShow = events;
