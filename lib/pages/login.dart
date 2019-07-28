@@ -10,13 +10,15 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
   bool canLogin;
 
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   FocusNode emailFocusNode;
   FocusNode passwordFocusNode;
+  Animation<double> _animation;
+  AnimationController _animationController;
 
   @override
   void initState() {
@@ -24,6 +26,9 @@ class _LoginPageState extends State<LoginPage> {
     canLogin = false;
     emailFocusNode = FocusNode();
     passwordFocusNode = FocusNode();
+    _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 1500));
+    _animation = CurvedAnimation(parent: Tween<double>(begin: 0.5, end: 1.0).animate(_animationController), curve: Curves.elasticInOut);
+    _animationController.forward();
   }
 
   void _checkInputValid(String _) {
@@ -104,10 +109,13 @@ class _LoginPageState extends State<LoginPage> {
                 Expanded(
                   child: Container(
                     child: Center(
-                      child: FractionallySizedBox(
-                        child: Image.asset('assets/images/mark.png'),
-                        widthFactor: 0.4,
-                        heightFactor: 0.4,
+                      child: ScaleTransition(
+                        scale: _animation,
+                        child: FractionallySizedBox(
+                          child: Image.asset('assets/images/mark.png'),
+                          widthFactor: 0.4,
+                          heightFactor: 0.4,
+                        ),
                       ),
                     ),
                   ),
