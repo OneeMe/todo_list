@@ -127,7 +127,7 @@ class Location {
   String description;
 
   /// 默认的构造器
-  Location(this.longitude, this.latitude, {this.description});
+  Location(this.longitude, this.latitude, this.description);
 
   /// 命名构造器，用于构造只有描述信息的 Location 对象
   Location.fromDescription(this.description)

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/components/date_filed_wrapper.dart';
 import 'package:todo_list/components/labeld_field.dart';
+import 'package:todo_list/components/location_filed_wrapper.dart';
 import 'package:todo_list/components/time_filed_wrapper.dart';
 import 'package:todo_list/config/colors.dart';
 import 'package:todo_list/model/todo.dart';
@@ -28,6 +29,8 @@ class _EditTodoPageState extends State<EditTodoPage> {
   final TimeFieldController _endTimeController = TimeFieldController();
   final TextEditingController _startTimeTextController =
       TextEditingController();
+  final TextEditingController _locationTextController = TextEditingController();
+  final LocationFieldController _locationController = LocationFieldController();
   final TextEditingController _dateTextController = TextEditingController();
   final TextEditingController _endTimeTextController = TextEditingController();
   final GlobalKey _priorityContainerKey = GlobalKey();
@@ -67,6 +70,9 @@ class _EditTodoPageState extends State<EditTodoPage> {
       OpenType.Edit: OpenTypeConfig('编辑 TODO', Icons.check, _submit),
       OpenType.Add: OpenTypeConfig('添加 TODO', Icons.check, _submit),
     };
+    _locationController.addListener(() {
+      _locationTextController.text = _locationController.location.description;
+    });
     _dateController.addListener(() {
       _dateTextController.text = formatAsChineseDate(_dateController.date);
     });
@@ -80,6 +86,7 @@ class _EditTodoPageState extends State<EditTodoPage> {
     if (_openType == OpenType.Preview) {
       _taskNameController.text = _todo.title;
       _taskDescController.text = _todo.description;
+      _locationController.location = _todo.location;
       _dateController.date = _todo.date;
 
       _startTimeController.time = _todo.startTime;
@@ -135,7 +142,6 @@ class _EditTodoPageState extends State<EditTodoPage> {
           },
           child: Form(
             key: _formKey,
-            autovalidate: true,
             child: Column(
               children: <Widget>[
                 _buildInputTextLine('名称', '任务名称', _taskNameFocusNode,
@@ -145,6 +151,9 @@ class _EditTodoPageState extends State<EditTodoPage> {
                 _buildInputTextLine('描述', '任务描述', _taskDescFocusNode,
                     controller: _taskDescController,
                     onSaved: (value) => _todo.description = value),
+                _buildLocationPicker('地点', '任务地点',
+                    locationController: _locationController,
+                    onSaved: (value) => _todo.location = value),
                 _buildDatePicker('日期', '请选择日期',
                     dateController: _dateController,
                     textController: _dateTextController,
@@ -199,6 +208,32 @@ class _EditTodoPageState extends State<EditTodoPage> {
           hintText: hintText,
           enabledBorder: _border,
         ),
+      ),
+    );
+  }
+
+  Widget _buildLocationPicker(
+  String title,
+      String hintText, {
+        LocationFieldController locationController,
+        TextEditingController textController,
+        Function(Location) onSaved,
+      }) {
+    return LabeledField(
+      labelText: title,
+      labelStyle: _titleStyle,
+      padding: _padding,
+      child: LocationFieldWrapper(
+        child: TextFormField(
+          controller: _locationTextController,
+          decoration: InputDecoration(
+            hintText: hintText,
+            disabledBorder: _border,
+            suffixIcon: Icon(Icons.location_on),
+          ),
+          onSaved: (_) => onSaved(locationController.location),
+        ),
+        controller: locationController,
       ),
     );
   }

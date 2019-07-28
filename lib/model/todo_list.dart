@@ -15,9 +15,13 @@ class TodoList {
   int get length => _todoList.length;
   List<Todo> get list => List.unmodifiable(_todoList);
 
+   void _add(Todo todo) {
+     _todoList.add(todo);
+     _sort();
+   }
+
   void add(Todo todo) {
-    _todoList.add(todo);
-    _sort();
+    _add(todo);
     int index = _todoList.indexOf(todo);
     _globalKey.currentState.insertItem(index, duration: Duration(milliseconds: 500));
   }
@@ -67,7 +71,7 @@ class TodoList {
       return false;
     }
     _todoList.remove(oldTodo);
-    add(todo);
+    _add(todo);
     return true;
   }
 }
