@@ -30,9 +30,10 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: [
-        const Locale('en'),
-        const Locale('zh', 'CN'),
+        const Locale('zh', 'CH'),
+        const Locale('en', 'US'),
       ],
+      locale: Locale('zh'),
       initialRoute: LOGIN_PAGE_URL,
       routes: {
         TODO_ENTRY_PAGE_URL: (_) => TodoEntryPage(),
