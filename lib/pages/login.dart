@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:todo_list/components/image_hero.dart';
 import 'dart:convert';
 
 import 'package:todo_list/pages/register.dart';
@@ -19,6 +20,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   FocusNode passwordFocusNode;
   Animation<double> _animation;
   AnimationController _animationController;
+  bool _isInit;
 
   @override
   void initState() {
@@ -27,8 +29,19 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     emailFocusNode = FocusNode();
     passwordFocusNode = FocusNode();
     _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 1500));
-    _animation = CurvedAnimation(parent: Tween<double>(begin: 0.5, end: 1.0).animate(_animationController), curve: Curves.elasticInOut);
-    _animationController.forward();
+    _animation = CurvedAnimation(parent: Tween<double>(begin: 1.0, end: 0.6).animate(_animationController), curve: Curves.elasticInOut);
+    _animation.addListener(() {
+      setState(() {});
+    });
+    _isInit = false;
+    Future.delayed(Duration(seconds: 0)).then((value) {
+      setState(() {
+        _isInit = true;
+      });
+    });
+    _animationController.forward().then((value) {
+      _animationController.reverse();
+    });
   }
 
   void _checkInputValid(String _) {
@@ -93,6 +106,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    String imageKey = 'assets/images/mark.png';
     return Scaffold(
       body: GestureDetector(
         onTap: () {
@@ -109,13 +123,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 Expanded(
                   child: Container(
                     child: Center(
-                      child: ScaleTransition(
-                        scale: _animation,
-                        child: FractionallySizedBox(
-                          child: Image.asset('assets/images/mark.png'),
-                          widthFactor: 0.4,
-                          heightFactor: 0.4,
-                        ),
+                      child: FractionallySizedBox(
+                        child: _isInit ? Image.asset(imageKey) : ImageHero(imageKey: imageKey),
+                        widthFactor: 0.4 * _animation.value,
+                        heightFactor: 0.4 * _animation.value,
                       ),
                     ),
                   ),
