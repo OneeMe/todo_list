@@ -44,6 +44,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     });
   }
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
+
   void _checkInputValid(String _) {
     bool isInputValid = _emailController.text.contains('@') &&
         _passwordController.text.length >= 6;
@@ -56,7 +64,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }
 
   _login() async {
-    Navigator.of(context).pushNamed(TODO_ENTRY_PAGE_URL);
+    Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL);
     // String email = _emailController.text;
     // String password = _passwordController.text;
     // showDialog(
