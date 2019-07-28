@@ -10,66 +10,90 @@ class TodoListPage extends StatefulWidget {
   const TodoListPage({Key key}) : super(key: key);
 
   @override
-  TodoListPageState createState() => TodoListPageState(generateTodos(5));
+  TodoListPageState createState() => TodoListPageState();
 }
 
 class TodoListPageState extends State<TodoListPage> {
-  final TodoList _todoList;
+  TodoList _todoList;
+  final GlobalKey<AnimatedListState> _animatedListKey = GlobalKey<AnimatedListState>();
 
-  TodoListPageState(this._todoList);
+  TodoListPageState();
 
   @override
   void initState() {
     super.initState();
+    _todoList = TodoList(generateTodos(5), _animatedListKey, _removedItemBuilder);
   }
 
+  void addTodo(Todo todo) {
+    _todoList.add(todo);
+  }
 
-  void insertTodo(Todo todo) {
+  void _onFinished(Todo todo) {
     setState(() {
-      _todoList.add(todo);
+      _todoList.finishedAt(todo.id);
     });
+  }
+
+  void _onStar(Todo todo) {
+    setState(() {
+      _todoList.starAt(todo.id);
+    });
+  }
+
+  void _onTap(Todo todo) async {
+    Todo changedTodo = await Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL, arguments: EditTodoPageArgument(openType: OpenType.Preview, todo: todo));
+    if (changedTodo == null) {
+      return;
+    }
+    _todoList.updateTodo(todo.id, todo);
+  }
+
+  void _onLongPress(Todo todo) async {
+    bool result = await showCupertinoDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return DeleteTodoDialog(
+            todo: todo,
+          );
+        }
+    );
+    if (result) {
+      _todoList.remove(todo.id);
+    }
+  }
+
+  Widget _removedItemBuilder(Todo todo, BuildContext context, Animation<double> animation) {
+    return SizeTransition(
+      sizeFactor: animation,
+      child: _buildTodo(todo),
+    );
+  }
+
+  Widget _buildTodo(Todo todo) {
+    return TodoItem(
+      todo: todo,
+      key: Key(todo.id),
+      onFinished: _onFinished,
+      onStar: _onStar,
+      onTap: _onTap,
+      onLongPress: _onLongPress,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: _todoList.length,
-      itemBuilder: (context, index) {
-        return TodoItem(
-          todo: _todoList.list[index],
-          key: Key(_todoList.list[index].id),
-          onFinished: (Todo todo) {
-            setState(() {
-              _todoList.finshedAt(todo.id);
-            });
-          },
-          onStar: (Todo todo) {
-            setState(() {
-              _todoList.starAt(todo.id);
-            });
-          },
-          onTap: (Todo todo) async {
-            Todo changedTodo = await Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL, arguments: EditTodoPageArgument(openType: OpenType.Preview, todo: todo));
-            if (changedTodo == null) {
-              return;
-            }
-            _todoList.updateTodo(todo.id, todo);
-          },
-          onLongPress: (Todo todo) async {
-            bool result = await showCupertinoDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return DeleteTodoDialog(
-                  todo: todo,
-                );
-              }
-            );
-            if (result) {
-              setState(() {
-                _todoList.remove(todo.id);
-              });
-            }
-          },
+    return AnimatedList(
+      key: _animatedListKey,
+      initialItemCount: _todoList.length,
+      itemBuilder: (context, index, animation) {
+        Todo todo = _todoList.list[index];
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: Offset(1, 0),
+            end: Offset.zero,
+          ).animate(animation),
+          child: _buildTodo(todo),
         );
       },
     );

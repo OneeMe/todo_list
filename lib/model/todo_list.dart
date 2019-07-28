@@ -1,9 +1,14 @@
+import 'package:flutter/widgets.dart';
 import 'package:todo_list/model/todo.dart';
+
+typedef RemovedItemBuilder = Widget Function(Todo todo, BuildContext context, Animation<double> animation);
 
 class TodoList {
   final List<Todo> _todoList;
+  final GlobalKey<AnimatedListState> _globalKey;
+  final RemovedItemBuilder _removedItemBuilder;
 
-  TodoList(this._todoList) {
+  TodoList(this._todoList, this._globalKey, this._removedItemBuilder) {
     _sort();
   }
 
@@ -13,10 +18,18 @@ class TodoList {
   void add(Todo todo) {
     _todoList.add(todo);
     _sort();
+    int index = _todoList.indexOf(todo);
+    _globalKey.currentState.insertItem(index, duration: Duration(milliseconds: 500));
   }
 
   void remove(String id) {
-    _todoList.removeWhere((todo) => todo.id == id);
+    Todo todo = find(id);
+    int index = _todoList.indexOf(todo);
+    if (index > _todoList.length) {
+      return;
+    }
+    _todoList.removeAt(index);
+    _globalKey.currentState.removeItem(index, (BuildContext context, Animation<double> animation) => _removedItemBuilder(todo, context, animation));
   }
 
   void _sort() {
@@ -28,7 +41,7 @@ class TodoList {
     return index >= 0 ? _todoList[index] : null;
   }
 
-  bool finshedAt(String id) {
+  bool finishedAt(String id) {
     Todo todo = find(id);
     if (todo == null) {
       return false;

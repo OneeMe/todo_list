@@ -38,7 +38,7 @@ class _TodoEntryState extends State<TodoEntryPage> {
       if (index == 2) {
         Todo todo = await Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL, arguments: EditTodoPageArgument(openType: OpenType.Add));
         if (todo != null) {
-          _todoListStateKey.currentState.insertTodo(todo);
+          _todoListStateKey.currentState.addTodo(todo);
           index = 0;
         } else {
           index = currentIndex;

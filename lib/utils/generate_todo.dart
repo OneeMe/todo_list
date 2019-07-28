@@ -3,14 +3,14 @@ import 'package:mock_data/mock_data.dart';
 import 'package:todo_list/model/todo.dart';
 import 'package:todo_list/model/todo_list.dart';
 
-TodoList generateTodos(int length) {
+List<Todo> generateTodos(int length) {
   List<Priority> priorities = [
     Priority.Unspecific,
     Priority.Medium,
     Priority.Medium,
     Priority.High,
   ];
-  return TodoList(List.generate(length, (i) {
+  return List.generate(length, (i) {
     DateTime date = mockDate(DateTime(2019, 1, 1));
     DateTime startTime = date.add(Duration(hours: mockInteger(1, 9)));
     DateTime endTime = startTime.add(Duration(hours: mockInteger(1, 9)));
@@ -24,7 +24,7 @@ TodoList generateTodos(int length) {
       isFinished: mockBool(),
       isStar: mockBool(),
     );
-  }));
+  });
 }
 
 bool mockBool() {
