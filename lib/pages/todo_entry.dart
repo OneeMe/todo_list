@@ -29,7 +29,7 @@ class _TodoEntryState extends State<TodoEntryPage> {
       TabConfig(title: '日历', page: CalendarPage(), imagePath: 'assets/images/calendar.png'),
       TabConfig(title: '', page: Container(), imagePath: 'assets/images/add.png', size: 50, singleImage: true),
       TabConfig(title: '任务回顾', page: ReporterPage(), imagePath: 'assets/images/report.png'),
-      TabConfig(title: '设置', page: SettingsPage(), imagePath: 'assets/images/settings.png'),
+      TabConfig(title: '关于', page: SettingsPage(), imagePath: 'assets/images/settings.png'),
     ];
   }
 

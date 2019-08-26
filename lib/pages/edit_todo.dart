@@ -131,63 +131,97 @@ class _EditTodoPageState extends State<EditTodoPage> {
   }
 
   Widget _buildForm() {
+    bool canEdit = _openType != OpenType.Preview;
     return SingleChildScrollView(
-      child: IgnorePointer(
-        ignoring: _openType == OpenType.Preview ? true : false,
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () {
-            // 触摸收起键盘
-            FocusScope.of(context).unfocus();
-          },
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: <Widget>[
-                _buildInputTextLine('名称', '任务名称', _taskNameFocusNode,
-                    maxLines: 1,
-                    controller: _taskNameController,
-                    onSaved: (value) => _todo.title = value),
-                _buildInputTextLine('描述', '任务描述', _taskDescFocusNode,
-                    controller: _taskDescController,
-                    onSaved: (value) => _todo.description = value),
-                _buildLocationPicker('地点', '任务地点',
-                    locationController: _locationController,
-                    onSaved: (value) => _todo.location = value),
-                _buildDatePicker('日期', '请选择日期',
-                    dateController: _dateController,
-                    textController: _dateTextController,
-                    onSaved: (value) => _todo.date = value),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Expanded(
-                      child: _buildTimePicker('开始时间', '请选择开始时间',
-                          timeController: _startTimeController,
-                          textController: _startTimeTextController,
-                          onSaved: (value) => _todo.startTime = value),
-                    ),
-                    Expanded(
-                      child: _buildTimePicker('终止时间', '请选择终止时间',
-                          timeController: _endTimeController,
-                          textController: _endTimeTextController,
-                          onSaved: (value) => _todo.endTime = value),
-                    ),
-                  ],
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () {
+          // 触摸收起键盘
+          FocusScope.of(context).unfocus();
+        },
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: <Widget>[
+              _buildInputTextLine(
+                '名称',
+                '任务名称',
+                _taskNameFocusNode,
+                maxLines: 1,
+                controller: _taskNameController,
+                onSaved: (value) => _todo.title = value,
+                canEdit: canEdit,
+              ),
+              _buildInputTextLine(
+                '描述',
+                '任务描述',
+                _taskDescFocusNode,
+                controller: _taskDescController,
+                onSaved: (value) => _todo.description = value,
+                canEdit: canEdit,
+              ),
+              GestureDetector(
+                child: _buildLocationPicker(
+                  '地点',
+                  '任务地点',
+                  locationController: _locationController,
+                  onSaved: (value) => _todo.location = value,
+                  canEdit: canEdit,
                 ),
-                _buildPriorityWidget(),
-              ],
-            ),
+                onLongPress: () => Navigator.of(context).pushNamed(LOCATION_DETAIL_PAGE_URL, arguments: LocationDetailArgument('location')),
+              ),
+              _buildDatePicker(
+                '日期',
+                '请选择日期',
+                dateController: _dateController,
+                textController: _dateTextController,
+                onSaved: (value) => _todo.date = value,
+                canEdit: canEdit,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Expanded(
+                    child: _buildTimePicker(
+                      '开始时间',
+                      '请选择开始时间',
+                      timeController: _startTimeController,
+                      textController: _startTimeTextController,
+                      onSaved: (value) => _todo.startTime = value,
+                      canEdit: canEdit,
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildTimePicker(
+                      '终止时间',
+                      '请选择终止时间',
+                      timeController: _endTimeController,
+                      textController: _endTimeTextController,
+                      onSaved: (value) => _todo.endTime = value,
+                      canEdit: canEdit,
+                    ),
+                  ),
+                ],
+              ),
+              _buildPriorityWidget(
+                canEdit: canEdit,
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildInputTextLine(String title, String hintText, FocusNode focusNode,
-      {int maxLines,
-      TextEditingController controller,
-      FormFieldSetter<String> onSaved}) {
+  Widget _buildInputTextLine(
+    String title,
+    String hintText,
+    FocusNode focusNode, {
+    int maxLines,
+    TextEditingController controller,
+    FormFieldSetter<String> onSaved,
+    bool canEdit = false,
+  }) {
     TextInputType inputType =
         maxLines == null ? TextInputType.multiline : TextInputType.text;
     return LabeledField(
@@ -195,6 +229,7 @@ class _EditTodoPageState extends State<EditTodoPage> {
       labelStyle: _titleStyle,
       padding: _padding,
       child: TextFormField(
+        enabled: canEdit,
         keyboardType: inputType,
         validator: (String value) {
           return value.length > 0 ? null : '$title 不能为空';
@@ -213,17 +248,19 @@ class _EditTodoPageState extends State<EditTodoPage> {
   }
 
   Widget _buildLocationPicker(
-  String title,
-      String hintText, {
-        LocationFieldController locationController,
-        TextEditingController textController,
-        Function(Location) onSaved,
-      }) {
+    String title,
+    String hintText, {
+    LocationFieldController locationController,
+    TextEditingController textController,
+    Function(Location) onSaved,
+    bool canEdit = false,
+  }) {
     return LabeledField(
       labelText: title,
       labelStyle: _titleStyle,
       padding: _padding,
       child: LocationFieldWrapper(
+        canEdit: canEdit,
         child: TextFormField(
           controller: _locationTextController,
           decoration: InputDecoration(
@@ -244,6 +281,7 @@ class _EditTodoPageState extends State<EditTodoPage> {
     DateFieldController dateController,
     TextEditingController textController,
     Function(DateTime) onSaved,
+    bool canEdit = false,
   }) {
     DateTime now = DateTime.now();
     return LabeledField(
@@ -251,7 +289,9 @@ class _EditTodoPageState extends State<EditTodoPage> {
       labelStyle: _titleStyle,
       padding: _padding,
       child: DateFieldWrapper(
+        canEdit: canEdit,
         child: TextFormField(
+          enabled: canEdit,
           controller: textController,
           decoration: InputDecoration(
             hintText: hintText,
@@ -276,13 +316,16 @@ class _EditTodoPageState extends State<EditTodoPage> {
     TimeFieldController timeController,
     TextEditingController textController,
     Function(TimeOfDay) onSaved,
+    bool canEdit = false,
   }) {
     return LabeledField(
       labelText: title,
       labelStyle: _titleStyle,
       padding: _padding,
       child: TimeFieldWrapper(
+        canEdit: canEdit,
         child: TextFormField(
+          enabled: canEdit,
           controller: textController,
           decoration: InputDecoration(
             hintText: hintText,
@@ -299,7 +342,9 @@ class _EditTodoPageState extends State<EditTodoPage> {
     );
   }
 
-  Widget _buildPriorityWidget() {
+  Widget _buildPriorityWidget({
+    bool canEdit = false,
+  }) {
     return LabeledField(
       labelText: '优先级',
       labelStyle: _titleStyle,
@@ -317,7 +362,7 @@ class _EditTodoPageState extends State<EditTodoPage> {
                 ),
                 GestureDetector(
                   behavior: HitTestBehavior.translucent,
-                  onTap: _showPriorityMenu,
+                  onTap: canEdit ? _showPriorityMenu : () {},
                   child: Container(
                     width: 100,
                     height: 50,

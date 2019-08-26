@@ -23,6 +23,7 @@ class TimeFieldWrapper extends StatelessWidget {
     @required this.initialTime,
     this.builder,
     @required this.child,
+    this.canEdit,
   })  : assert(controller != null),
         super(key: key);
 
@@ -30,6 +31,7 @@ class TimeFieldWrapper extends StatelessWidget {
   final TimeOfDay initialTime;
   final TransitionBuilder builder;
   final Widget child;
+  final bool canEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +40,9 @@ class TimeFieldWrapper extends StatelessWidget {
         child: child,
       ),
       onTap: () async {
+        if (canEdit == false) {
+          return;
+        }
         TimeOfDay timeOfDay = await showTimePicker(
           context: context,
           initialTime: controller.time ?? initialTime,

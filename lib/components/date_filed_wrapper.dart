@@ -28,6 +28,7 @@ class DateFieldWrapper extends StatelessWidget {
     this.selectableDayPredicate,
     this.initialDatePickerMode = DatePickerMode.day,
     this.builder,
+    this.canEdit = true,
     @required this.child,
   })  : assert(controller != null),
         super(key: key);
@@ -56,6 +57,8 @@ class DateFieldWrapper extends StatelessWidget {
   /// 用来展示选择的日期的组件
   final Widget child;
 
+  final bool canEdit;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -64,6 +67,9 @@ class DateFieldWrapper extends StatelessWidget {
       ),
       /// 当点击 child 组件的时候会弹出日期选择对话框
       onTap: () async {
+        if (canEdit == false) {
+          return;
+        }
         DateTime date = controller.date ?? initialDate;
         /// 弹出日期选择对话框
         DateTime selectedDate = await showDatePicker(

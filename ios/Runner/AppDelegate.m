@@ -1,5 +1,6 @@
 #include "AppDelegate.h"
 #include "GeneratedPluginRegistrant.h"
+#import "PlatformViewFactory.h"
 
 @implementation AppDelegate
 
@@ -22,6 +23,8 @@
             result(FlutterMethodNotImplemented);
         }
     }];
+    PlatformViewFactory *factory = [[PlatformViewFactory alloc] init];
+    [[self registrarForPlugin:@"com.funny.flutter.platform.view"] registerViewFactory:factory withId:@"platform_text_view"];
   [GeneratedPluginRegistrant registerWithRegistry:self];
   // Override point for customization after application launch.
   return [super application:application didFinishLaunchingWithOptions:launchOptions];

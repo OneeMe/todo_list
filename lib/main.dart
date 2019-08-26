@@ -5,6 +5,7 @@ import 'package:todo_list/config/colors.dart';
 import 'package:todo_list/model/todo.dart';
 import 'package:todo_list/page_route/fade_page_route.dart';
 import 'package:todo_list/pages/edit_todo.dart';
+import 'package:todo_list/pages/location_detail.dart';
 import 'package:todo_list/pages/login.dart';
 import 'package:todo_list/pages/register.dart';
 import 'package:todo_list/pages/route_url.dart';
@@ -47,6 +48,9 @@ class MyApp extends StatelessWidget {
         }
         if (settings.name == EDIT_TODO_PAGE_URL) {
           return CupertinoPageRoute<Todo>(builder: (_) => EditTodoPage(argument: settings.arguments), fullscreenDialog: true);
+        }
+        if (settings.name == LOCATION_DETAIL_PAGE_URL) {
+          return MaterialPageRoute(builder: (_) => LocationDetailPage(argument: settings.arguments));
         }
       },
       onUnknownRoute: (RouteSettings settings) {

@@ -16,6 +16,8 @@ public class MainActivity extends FlutterActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PlatformTextViewFactory factory = new PlatformTextViewFactory();
+        registrarFor("com.funny.flutter.platform.view").platformViewRegistry().registerViewFactory("platform_text_view", factory);
         GeneratedPluginRegistrant.registerWith(this);
         // 新建一个 MethodChannel 对象
         new MethodChannel(getFlutterView(), CHANNEL).setMethodCallHandler((MethodCall call, MethodChannel.Result result) -> {
