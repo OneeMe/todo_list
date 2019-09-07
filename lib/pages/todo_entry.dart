@@ -6,6 +6,7 @@ import 'package:todo_list/pages/reporter.dart';
 import 'package:todo_list/pages/route_url.dart';
 import 'package:todo_list/pages/settings.dart';
 import 'package:todo_list/pages/todo_list.dart';
+import 'package:todo_list/utils/generate_todo.dart';
 
 class TodoEntryPage extends StatefulWidget {
   TodoEntryPage({Key key}) : super(key: key);

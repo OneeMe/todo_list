@@ -8,7 +8,7 @@ class TodoList {
   final GlobalKey<AnimatedListState> _globalKey;
   final RemovedItemBuilder _removedItemBuilder;
 
-  TodoList(this._todoList, this._globalKey, this._removedItemBuilder) {
+  TodoList(this._todoList, [this._globalKey, this._removedItemBuilder]) {
     _sort();
   }
 
@@ -23,7 +23,7 @@ class TodoList {
   void add(Todo todo) {
     _add(todo);
     int index = _todoList.indexOf(todo);
-    _globalKey.currentState.insertItem(index, duration: Duration(milliseconds: 500));
+    _globalKey?.currentState?.insertItem(index, duration: Duration(milliseconds: 500));
   }
 
   void remove(String id) {
@@ -33,7 +33,7 @@ class TodoList {
       return;
     }
     _todoList.removeAt(index);
-    _globalKey.currentState.removeItem(index, (BuildContext context, Animation<double> animation) => _removedItemBuilder(todo, context, animation));
+    _globalKey?.currentState?.removeItem(index, (BuildContext context, Animation<double> animation) => _removedItemBuilder(todo, context, animation));
   }
 
   void _sort() {
