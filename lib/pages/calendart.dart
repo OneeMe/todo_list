@@ -5,22 +5,29 @@ import 'package:todo_list/model/todo_list.dart';
 import 'package:todo_list/utils/generate_todo.dart';
 
 class CalendarPage extends StatefulWidget {
-  CalendarPage({Key key}) : super(key: key);
+  CalendarPage({Key key, this.todoList}) : super(key: key);
+
+  final TodoList todoList;
 
   @override
   _CalendarPageState createState() => _CalendarPageState();
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  TodoList _todoList;
   Map<DateTime, List<Todo>> _date2TodoMap = {};
   List<Todo> _todosToShow = [];
 
   @override
   void initState() {
     super.initState();
-    _todoList = TodoList(generateTodos(5));
     _initDate2TodoMap();
+    widget.todoList.addListener(() {
+      setState(() {
+        _todosToShow.clear();
+        _date2TodoMap.clear();
+        _initDate2TodoMap();
+      });
+    });
   }
 
   @override
@@ -36,11 +43,9 @@ class _CalendarPageState extends State<CalendarPage> {
             todayStyle: TextStyle(color: Colors.black),
           ),
           onDaySelected: (DateTime day, List events) {
-            this.setState(
-              () {
-                _todosToShow = events.cast<Todo>();
-              },
-            );
+            this.setState(() {
+              _todosToShow = events.cast<Todo>();
+            });
           },
         ),
         Expanded(
@@ -51,7 +56,7 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   void _initDate2TodoMap() {
-    _todoList.list.forEach((todo) {
+    widget.todoList.list.forEach((todo) {
       _date2TodoMap.putIfAbsent(todo.date, () => []);
       _date2TodoMap[todo.date].add(todo);
     });

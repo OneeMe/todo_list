@@ -80,10 +80,10 @@ class Todo {
     if (isFinished) {
       return TodoStatus.finished;
     }
-    if (date == null || endTime == null || date.isAfter(DateTime.now())) {
-      return TodoStatus.handling;
+    if (date != null && date.isBefore(DateTime.now())) {
+      return TodoStatus.delay;
     }
-    return TodoStatus.delay;
+    return TodoStatus.unspecified;
   }
 }
 
@@ -171,15 +171,15 @@ class TodoStatus {
   bool isFinished() => this == TodoStatus.finished;
 
   /// 支持用整型值创建 TaskStatus 对象
-  factory TodoStatus(int status) => values.firstWhere((e) => e.value == status, orElse: () => handling);
+  factory TodoStatus(int status) => values.firstWhere((e) => e.value == status, orElse: () => unspecified);
 
   /// 下面定义了允许用户使用的4个枚举值
-  static const TodoStatus handling = TodoStatus._(0, '处理中', const Color(0xff8c88ff));
+  static const TodoStatus unspecified = TodoStatus._(0, '未安排', const Color(0xff8c88ff));
   static const TodoStatus finished = TodoStatus._(1, '已完成', const Color(0xff51d2c2));
   static const TodoStatus delay = TodoStatus._(2, '已延期', const Color(0xffffb258));
 
   static const List<TodoStatus> values = [
-    handling,
+    unspecified,
     finished,
     delay,
   ];

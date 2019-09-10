@@ -304,7 +304,7 @@ class _EditTodoPageState extends State<EditTodoPage> {
         ),
         controller: dateController,
         initialDate: now,
-        firstDate: DateTime(now.year, now.month, now.day - 1),
+        firstDate: dateController.date ?? DateTime(now.year, now.month, now.day - 1),
         lastDate: DateTime(2025),
       ),
     );

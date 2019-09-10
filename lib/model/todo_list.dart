@@ -3,12 +3,10 @@ import 'package:todo_list/model/todo.dart';
 
 typedef RemovedItemBuilder = Widget Function(Todo todo, BuildContext context, Animation<double> animation);
 
-class TodoList {
+class TodoList with ChangeNotifier {
   final List<Todo> _todoList;
-  final GlobalKey<AnimatedListState> _globalKey;
-  final RemovedItemBuilder _removedItemBuilder;
 
-  TodoList(this._todoList, [this._globalKey, this._removedItemBuilder]) {
+  TodoList(this._todoList) {
     _sort();
   }
 
@@ -22,18 +20,18 @@ class TodoList {
 
   void add(Todo todo) {
     _add(todo);
-    int index = _todoList.indexOf(todo);
-    _globalKey?.currentState?.insertItem(index, duration: Duration(milliseconds: 500));
+    notifyListeners();
   }
 
-  void remove(String id) {
+  int remove(String id) {
     Todo todo = find(id);
     int index = _todoList.indexOf(todo);
     if (index > _todoList.length) {
-      return;
+      return -1;
     }
     _todoList.removeAt(index);
-    _globalKey?.currentState?.removeItem(index, (BuildContext context, Animation<double> animation) => _removedItemBuilder(todo, context, animation));
+    notifyListeners();
+    return index;
   }
 
   void _sort() {
@@ -62,6 +60,7 @@ class TodoList {
     }
     todo.isStar = !todo.isStar;
     _sort();
+    notifyListeners();
     return true;
   }
 
@@ -72,6 +71,7 @@ class TodoList {
     }
     _todoList.remove(oldTodo);
     _add(todo);
+    notifyListeners();
     return true;
   }
 }

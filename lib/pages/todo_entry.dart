@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/config/colors.dart';
 import 'package:todo_list/model/todo.dart';
+import 'package:todo_list/model/todo_list.dart';
 import 'package:todo_list/pages/calendart.dart';
 import 'package:todo_list/pages/reporter.dart';
 import 'package:todo_list/pages/route_url.dart';
@@ -17,19 +18,19 @@ class TodoEntryPage extends StatefulWidget {
 class _TodoEntryState extends State<TodoEntryPage> {
   // List<Widget> childPages;
   int currentIndex;
-  final GlobalKey<TodoListPageState> _todoListStateKey = GlobalKey<TodoListPageState>();
   List<TabConfig> _tabConfigs;
-
+  TodoList _todoList;
 
   @override
   void initState() {
     super.initState();
     currentIndex = 0;
+    _todoList = TodoList(generateTodos(100));
     _tabConfigs = [
-      TabConfig(title: '你的清单', page: TodoListPage(key: _todoListStateKey), imagePath: 'assets/images/lists.png'),
-      TabConfig(title: '日历', page: CalendarPage(), imagePath: 'assets/images/calendar.png'),
+      TabConfig(title: '你的清单', page: TodoListPage(todoList: _todoList), imagePath: 'assets/images/lists.png'),
+      TabConfig(title: '日历', page: CalendarPage(todoList: _todoList), imagePath: 'assets/images/calendar.png'),
       TabConfig(title: '', page: Container(), imagePath: 'assets/images/add.png', size: 50, singleImage: true),
-      TabConfig(title: '任务回顾', page: ReporterPage(), imagePath: 'assets/images/report.png'),
+      TabConfig(title: '任务回顾', page: ReporterPage(todoList: _todoList), imagePath: 'assets/images/report.png'),
       TabConfig(title: '关于', page: SettingsPage(), imagePath: 'assets/images/settings.png'),
     ];
   }
@@ -39,7 +40,7 @@ class _TodoEntryState extends State<TodoEntryPage> {
       if (index == 2) {
         Todo todo = await Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL, arguments: EditTodoPageArgument(openType: OpenType.Add));
         if (todo != null) {
-          _todoListStateKey.currentState.addTodo(todo);
+          _todoList.add(todo);
           index = 0;
         } else {
           index = currentIndex;
