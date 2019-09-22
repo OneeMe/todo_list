@@ -3,7 +3,7 @@ import 'package:todo_list/config/colors.dart';
 import 'package:todo_list/pages/calendart.dart';
 import 'package:todo_list/pages/reporter.dart';
 import 'package:todo_list/pages/route_url.dart';
-import 'package:todo_list/pages/settings.dart';
+import 'package:todo_list/pages/about.dart';
 import 'package:todo_list/pages/todo_list.dart';
 
 class TodoEntryPage extends StatefulWidget {
@@ -21,7 +21,7 @@ class _TodoEntryState extends State<TodoEntryPage> {
     TabConfig(title: '日历', page: CalendarPage(), imagePath: 'assets/images/calendar.png'),
     TabConfig(title: '', page: Container(), imagePath: 'assets/images/add.png', size: 50, singleImage: true),
     TabConfig(title: '任务回顾', page: ReporterPage(), imagePath: 'assets/images/report.png'),
-    TabConfig(title: '设置', page: SettingsPage(), imagePath: 'assets/images/settings.png'),
+    TabConfig(title: '关于', page: AboutPage(), imagePath: 'assets/images/about.png'),
   ];
 
   @override
@@ -30,7 +30,7 @@ class _TodoEntryState extends State<TodoEntryPage> {
     currentIndex = 0;
   }
 
-  void onTabChange(int index) async {
+  void _onTabChange(int index) async {
     if (mounted) {
       if (index == 2) {
         await Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL);
@@ -57,7 +57,7 @@ class _TodoEntryState extends State<TodoEntryPage> {
          centerTitle: true,
        ),
        bottomNavigationBar: BottomNavigationBar(
-         onTap: onTabChange,
+         onTap: _onTabChange,
          currentIndex: currentIndex,
          type: BottomNavigationBarType.fixed,
          items: tabConfigs.map((config) => config.navigationBarItem).toList(),
@@ -71,10 +71,10 @@ class TabConfig {
   final String title;
   /// Tab 上显示的图片
   final String imagePath;
-  /// 如果想设置自定义的 Widget，可以使用这个选项
-  final BottomNavigationBarItem navigationBarItem;
   /// tab 对应的页面
   final Widget page;
+  /// 根据配置生成的 BottomNavigationBarItem
+  final BottomNavigationBarItem navigationBarItem;
 
   TabConfig({
     this.title,
