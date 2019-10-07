@@ -20,10 +20,8 @@ class EditTodoPage extends StatefulWidget {
 }
 
 class _EditTodoPageState extends State<EditTodoPage> {
-  final FocusNode _taskNameFocusNode = FocusNode();
-  final FocusNode _taskDescFocusNode = FocusNode();
-  final TextEditingController _taskNameController = TextEditingController();
-  final TextEditingController _taskDescController = TextEditingController();
+  final TextEditingController _todoNameController = TextEditingController();
+  final TextEditingController _todoDescController = TextEditingController();
   final DateFieldController _dateController = DateFieldController();
   final TimeFieldController _startTimeController = TimeFieldController();
   final TimeFieldController _endTimeController = TimeFieldController();
@@ -36,7 +34,7 @@ class _EditTodoPageState extends State<EditTodoPage> {
   final GlobalKey _priorityContainerKey = GlobalKey();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final EdgeInsetsGeometry _padding = const EdgeInsets.fromLTRB(20, 10, 20, 20);
+  final EdgeInsetsGeometry _labeledFieldPadding = const EdgeInsets.fromLTRB(20, 10, 20, 20);
   final TextStyle _titleStyle =
       TextStyle(color: Color(0xFF1D1D26), fontFamily: 'Avenir', fontSize: 14.0);
   final InputBorder _border = UnderlineInputBorder(
@@ -84,8 +82,8 @@ class _EditTodoPageState extends State<EditTodoPage> {
       _endTimeTextController.text = formatTimeOfDay(_endTimeController.time);
     });
     if (_openType == OpenType.Preview) {
-      _taskNameController.text = _todo.title;
-      _taskDescController.text = _todo.description;
+      _todoNameController.text = _todo.title;
+      _todoDescController.text = _todo.description;
       _locationController.location = _todo.location;
       _dateController.date = _todo.date;
 
@@ -97,10 +95,8 @@ class _EditTodoPageState extends State<EditTodoPage> {
   @override
   void dispose() {
     super.dispose();
-    _taskNameFocusNode.dispose();
-    _taskDescFocusNode.dispose();
-    _taskNameController.dispose();
-    _taskDescController.dispose();
+    _todoNameController.dispose();
+    _todoDescController.dispose();
     _dateController.dispose();
     _startTimeController.dispose();
     _endTimeController.dispose();
@@ -133,80 +129,75 @@ class _EditTodoPageState extends State<EditTodoPage> {
   Widget _buildForm() {
     bool canEdit = _openType != OpenType.Preview;
     return SingleChildScrollView(
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () {
-          // 触摸收起键盘
-          FocusScope.of(context).unfocus();
-        },
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: <Widget>[
-              _buildInputTextLine(
-                '名称',
-                '任务名称',
-                _taskNameFocusNode,
-                maxLines: 1,
-                controller: _taskNameController,
-                onSaved: (value) => _todo.title = value,
-                canEdit: canEdit,
-              ),
-              _buildInputTextLine(
-                '描述',
-                '任务描述',
-                _taskDescFocusNode,
-                controller: _taskDescController,
-                onSaved: (value) => _todo.description = value,
-                canEdit: canEdit,
-              ),
-              GestureDetector(
-                child: _buildLocationPicker(
-                  '地点',
-                  '任务地点',
-                  locationController: _locationController,
-                  onSaved: (value) => _todo.location = value,
-                  canEdit: canEdit,
+      child: IgnorePointer(
+        ignoring: !canEdit,
+        child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: () {
+            // 触摸收起键盘
+            FocusScope.of(context).unfocus();
+          },
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: <Widget>[
+                _buildInputTextLine(
+                  '名称',
+                  '任务名称',
+                  maxLines: 1,
+                  controller: _todoNameController,
+                  onSaved: (value) => _todo.title = value,
                 ),
-                onLongPress: () => Navigator.of(context).pushNamed(LOCATION_DETAIL_PAGE_URL, arguments: LocationDetailArgument('location')),
-              ),
-              _buildDatePicker(
-                '日期',
-                '请选择日期',
-                dateController: _dateController,
-                textController: _dateTextController,
-                onSaved: (value) => _todo.date = value,
-                canEdit: canEdit,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Expanded(
-                    child: _buildTimePicker(
-                      '开始时间',
-                      '请选择开始时间',
-                      timeController: _startTimeController,
-                      textController: _startTimeTextController,
-                      onSaved: (value) => _todo.startTime = value,
-                      canEdit: canEdit,
-                    ),
+                _buildInputTextLine(
+                  '描述',
+                  '任务描述',
+                  controller: _todoDescController,
+                  onSaved: (value) => _todo.description = value,
+                ),
+                GestureDetector(
+                  child: _buildLocationPicker(
+                    '地点',
+                    '任务地点',
+                    locationController: _locationController,
+                    onSaved: (value) => _todo.location = value,
                   ),
-                  Expanded(
-                    child: _buildTimePicker(
-                      '终止时间',
-                      '请选择终止时间',
-                      timeController: _endTimeController,
-                      textController: _endTimeTextController,
-                      onSaved: (value) => _todo.endTime = value,
-                      canEdit: canEdit,
+                  onLongPress: () => Navigator.of(context).pushNamed(
+                      LOCATION_DETAIL_PAGE_URL,
+                      arguments: LocationDetailArgument('location')),
+                ),
+                _buildDatePicker(
+                  '日期',
+                  '请选择日期',
+                  dateController: _dateController,
+                  textController: _dateTextController,
+                  onSaved: (value) => _todo.date = value,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      child: _buildTimePicker(
+                        '开始时间',
+                        '请选择开始时间',
+                        timeController: _startTimeController,
+                        textController: _startTimeTextController,
+                        onSaved: (value) => _todo.startTime = value,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              _buildPriorityWidget(
-                canEdit: canEdit,
-              ),
-            ],
+                    Expanded(
+                      child: _buildTimePicker(
+                        '终止时间',
+                        '请选择终止时间',
+                        timeController: _endTimeController,
+                        textController: _endTimeTextController,
+                        onSaved: (value) => _todo.endTime = value,
+                      ),
+                    ),
+                  ],
+                ),
+                _buildPriorityWidget(),
+              ],
+            ),
           ),
         ),
       ),
@@ -215,28 +206,24 @@ class _EditTodoPageState extends State<EditTodoPage> {
 
   Widget _buildInputTextLine(
     String title,
-    String hintText,
-    FocusNode focusNode, {
+    String hintText, {
     int maxLines,
     TextEditingController controller,
     FormFieldSetter<String> onSaved,
-    bool canEdit = false,
   }) {
     TextInputType inputType =
         maxLines == null ? TextInputType.multiline : TextInputType.text;
     return LabeledField(
       labelText: title,
       labelStyle: _titleStyle,
-      padding: _padding,
+      padding: _labeledFieldPadding,
       child: TextFormField(
-        enabled: canEdit,
         keyboardType: inputType,
         validator: (String value) {
           return value.length > 0 ? null : '$title 不能为空';
         },
         onSaved: onSaved,
         textInputAction: TextInputAction.done,
-        focusNode: focusNode,
         maxLines: maxLines,
         controller: controller,
         decoration: InputDecoration(
@@ -253,14 +240,12 @@ class _EditTodoPageState extends State<EditTodoPage> {
     LocationFieldController locationController,
     TextEditingController textController,
     Function(Location) onSaved,
-    bool canEdit = false,
   }) {
     return LabeledField(
       labelText: title,
       labelStyle: _titleStyle,
-      padding: _padding,
+      padding: _labeledFieldPadding,
       child: LocationFieldWrapper(
-        canEdit: canEdit,
         child: TextFormField(
           controller: _locationTextController,
           decoration: InputDecoration(
@@ -281,17 +266,14 @@ class _EditTodoPageState extends State<EditTodoPage> {
     DateFieldController dateController,
     TextEditingController textController,
     Function(DateTime) onSaved,
-    bool canEdit = false,
   }) {
     DateTime now = DateTime.now();
     return LabeledField(
       labelText: title,
       labelStyle: _titleStyle,
-      padding: _padding,
+      padding: _labeledFieldPadding,
       child: DateFieldWrapper(
-        canEdit: canEdit,
         child: TextFormField(
-          enabled: canEdit,
           controller: textController,
           decoration: InputDecoration(
             hintText: hintText,
@@ -304,7 +286,8 @@ class _EditTodoPageState extends State<EditTodoPage> {
         ),
         controller: dateController,
         initialDate: now,
-        firstDate: dateController.date ?? DateTime(now.year, now.month, now.day - 1),
+        firstDate:
+            dateController.date ?? DateTime(now.year, now.month, now.day - 1),
         lastDate: DateTime(2025),
       ),
     );
@@ -316,16 +299,13 @@ class _EditTodoPageState extends State<EditTodoPage> {
     TimeFieldController timeController,
     TextEditingController textController,
     Function(TimeOfDay) onSaved,
-    bool canEdit = false,
   }) {
     return LabeledField(
       labelText: title,
       labelStyle: _titleStyle,
-      padding: _padding,
+      padding: _labeledFieldPadding,
       child: TimeFieldWrapper(
-        canEdit: canEdit,
         child: TextFormField(
-          enabled: canEdit,
           controller: textController,
           decoration: InputDecoration(
             hintText: hintText,
@@ -342,13 +322,11 @@ class _EditTodoPageState extends State<EditTodoPage> {
     );
   }
 
-  Widget _buildPriorityWidget({
-    bool canEdit = false,
-  }) {
+  Widget _buildPriorityWidget() {
     return LabeledField(
       labelText: '优先级',
       labelStyle: _titleStyle,
-      padding: _padding,
+      padding: _labeledFieldPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -362,7 +340,7 @@ class _EditTodoPageState extends State<EditTodoPage> {
                 ),
                 GestureDetector(
                   behavior: HitTestBehavior.translucent,
-                  onTap: canEdit ? _showPriorityMenu : () {},
+                  onTap: _showPriorityMenu,
                   child: Container(
                     width: 100,
                     height: 50,
