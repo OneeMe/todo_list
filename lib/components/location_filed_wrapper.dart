@@ -25,7 +25,6 @@ class LocationFieldWrapper extends StatefulWidget {
     Key key,
     @required this.controller,
     @required this.child,
-    this.canEdit = true,
   })  : assert(controller != null),
         super(key: key);
 
@@ -34,8 +33,6 @@ class LocationFieldWrapper extends StatefulWidget {
 
   /// 用来展示选择的位置的组件
   final Widget child;
-
-  final bool canEdit;
 
   @override
   _LocationFieldWrapperState createState() => _LocationFieldWrapperState();
@@ -66,9 +63,6 @@ class _LocationFieldWrapperState extends State<LocationFieldWrapper> {
       ),
       /// 当点击 child 组件的时候会弹出日期选择对话框
       onTap: () async {
-        if (widget.canEdit == false) {
-          return;
-        }
         setState(() {
           isLoading = true;
         });

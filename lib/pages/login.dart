@@ -11,7 +11,8 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
   bool canLogin;
 
   TextEditingController _emailController = TextEditingController();
@@ -28,8 +29,12 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     canLogin = false;
     emailFocusNode = FocusNode();
     passwordFocusNode = FocusNode();
-    _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 1500));
-    _animation = CurvedAnimation(parent: Tween<double>(begin: 1.0, end: 0.6).animate(_animationController), curve: Curves.elasticInOut);
+    _animationController = AnimationController(
+        vsync: this, duration: Duration(milliseconds: 1500));
+    Tween<double> tween = Tween<double>(begin: 1.0, end: 0.2);
+    Animation<double> parentAnimation = tween.animate(_animationController);
+    _animation =
+        CurvedAnimation(parent: parentAnimation, curve: Curves.elasticInOut);
     _animation.addListener(() {
       setState(() {});
     });
@@ -132,9 +137,11 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   child: Container(
                     child: Center(
                       child: FractionallySizedBox(
-                        child: _isInit ? Image.asset(imageKey) : ImageHero(imageKey: imageKey),
-                        widthFactor: 0.4 * _animation.value,
-                        heightFactor: 0.4 * _animation.value,
+                        child: _isInit
+                            ? Image.asset(imageKey)
+                            : ImageHero(imageKey: imageKey),
+                        widthFactor: _animation.value,
+                        heightFactor: _animation.value,
                       ),
                     ),
                   ),
@@ -184,7 +191,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         padding: EdgeInsets.only(
                             left: 24, right: 24, top: 12, bottom: 12),
                         child: FlatButton(
-                          onPressed:  _login,
+                          onPressed: _login,
                           color: Color.fromRGBO(69, 202, 181, 1),
                           disabledColor: Color.fromRGBO(69, 202, 160, 0.5),
                           child: Text(
@@ -204,7 +211,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             Text('没有账号？'),
                             InkWell(
                               child: Text('立即注册'),
-                              onTap: () => Navigator.of(context).pushReplacementNamed(REGISTER_PAGE_URL),
+                              onTap: () => Navigator.of(context)
+                                  .pushReplacementNamed(REGISTER_PAGE_URL),
                             ),
                           ],
                         ),

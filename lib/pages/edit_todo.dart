@@ -31,10 +31,10 @@ class _EditTodoPageState extends State<EditTodoPage> {
   final LocationFieldController _locationController = LocationFieldController();
   final TextEditingController _dateTextController = TextEditingController();
   final TextEditingController _endTimeTextController = TextEditingController();
-  final GlobalKey _priorityContainerKey = GlobalKey();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final EdgeInsetsGeometry _labeledFieldPadding = const EdgeInsets.fromLTRB(20, 10, 20, 20);
+  final EdgeInsetsGeometry _labeledFieldPadding =
+      const EdgeInsets.fromLTRB(20, 10, 20, 20);
   final TextStyle _titleStyle =
       TextStyle(color: Color(0xFF1D1D26), fontFamily: 'Avenir', fontSize: 14.0);
   final InputBorder _border = UnderlineInputBorder(
@@ -338,15 +338,20 @@ class _EditTodoPageState extends State<EditTodoPage> {
                 Container(
                   child: Text(_todo.priority.description),
                 ),
-                GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: _showPriorityMenu,
+                PopupMenuButton<Priority>(
+                  itemBuilder: (BuildContext context) => Priority.values
+                      .map((e) => _buildPriorityPopupMenuItem(e))
+                      .toList(),
+                  onSelected: (Priority priority) {
+                    this.setState(() {
+                      _todo.priority = priority;
+                    });
+                  },
                   child: Container(
                     width: 100,
                     height: 50,
                     alignment: Alignment.center,
                     child: Container(
-                      key: _priorityContainerKey,
                       width: 100,
                       height: 5,
                       color: _todo.priority.color,
@@ -356,31 +361,14 @@ class _EditTodoPageState extends State<EditTodoPage> {
               ],
             ),
           ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+          Divider(
+            height: 1,
+            thickness: 1,
             color: Colors.black26,
-            height: 0.5,
-          )
+          ),
         ],
       ),
     );
-  }
-
-  void _showPriorityMenu() async {
-    /// 弹出优先级选择菜单
-    Priority priority = await showMenu<Priority>(
-      context: context,
-      position: _getMenuPosition(context),
-      // 将Priority的所有值列表映射为PriorityPopupMenuItem列表
-      items:
-          Priority.values.map((e) => _buildPriorityPopupMenuItem(e)).toList(),
-    );
-    if (priority == null) return;
-
-    /// 将优先级值对应的Priority对象赋值给_priority
-    this.setState(() {
-      _todo.priority = priority;
-    });
   }
 
   PopupMenuItem<Priority> _buildPriorityPopupMenuItem(Priority priority) {
@@ -398,26 +386,6 @@ class _EditTodoPageState extends State<EditTodoPage> {
         ],
       ),
     );
-  }
-
-  RelativeRect _getMenuPosition(BuildContext context) {
-    /// 获取优先级展示框的色块的Container对象锁对应的RenderBox对象
-    final RenderBox renderBox =
-        _priorityContainerKey.currentContext.findRenderObject();
-
-    /// 获取当前上下文中图层对象
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject();
-
-    /// 将色块的右下角的坐标转换为全局坐标
-    final Offset startPoint = renderBox.localToGlobal(
-        Offset(renderBox.size.width, renderBox.size.height),
-        ancestor: overlay);
-
-    /// 构造色块右下角位置所对应的RelativeRect对象
-    return RelativeRect.fromSize(
-        Rect.fromLTRB(
-            startPoint.dx, startPoint.dy, startPoint.dx, startPoint.dy),
-        overlay.size);
   }
 }
 
