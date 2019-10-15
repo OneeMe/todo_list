@@ -136,12 +136,11 @@ class _LoginPageState extends State<LoginPage>
                 Expanded(
                   child: Container(
                     child: Center(
-                      child: FractionallySizedBox(
+                      child: FractionallySizedTrasition(
+                        animation: _animation,
                         child: _isInit
                             ? Image.asset(imageKey)
                             : ImageHero(imageKey: imageKey),
-                        widthFactor: _animation.value,
-                        heightFactor: _animation.value,
                       ),
                     ),
                   ),
@@ -225,6 +224,22 @@ class _LoginPageState extends State<LoginPage>
           ),
         ),
       ),
+    );
+  }
+}
+
+class FractionallySizedTrasition extends AnimatedWidget {
+  final Widget child;
+  FractionallySizedTrasition({Key key, Animation<double> animation, this.child})
+      : super(key: key, listenable: animation);
+
+  @override
+  Widget build(BuildContext context) {
+    Animation<double> animation = listenable;
+    return FractionallySizedBox(
+      child: child,
+      widthFactor: animation.value,
+      heightFactor: animation.value,
     );
   }
 }
