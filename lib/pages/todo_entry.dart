@@ -5,7 +5,7 @@ import 'package:todo_list/model/todo_list.dart';
 import 'package:todo_list/pages/calendart.dart';
 import 'package:todo_list/pages/reporter.dart';
 import 'package:todo_list/pages/route_url.dart';
-import 'package:todo_list/pages/settings.dart';
+import 'package:todo_list/pages/about.dart';
 import 'package:todo_list/pages/todo_list.dart';
 import 'package:todo_list/utils/generate_todo.dart';
 
@@ -31,7 +31,7 @@ class _TodoEntryState extends State<TodoEntryPage> {
       TabConfig(title: '日历', page: CalendarPage(todoList: _todoList), imagePath: 'assets/images/calendar.png'),
       TabConfig(title: '', page: Container(), imagePath: 'assets/images/add.png', size: 50, singleImage: true),
       TabConfig(title: '任务回顾', page: ReporterPage(todoList: _todoList), imagePath: 'assets/images/report.png'),
-      TabConfig(title: '关于', page: SettingsPage(), imagePath: 'assets/images/settings.png'),
+      TabConfig(title: '关于', page: AboutPage(), imagePath: 'assets/images/settings.png'),
     ];
   }
 

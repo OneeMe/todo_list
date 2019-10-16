@@ -10,7 +10,7 @@
     
     FlutterMethodChannel* channel = [FlutterMethodChannel
                                             methodChannelWithName:@"todo_list.example.io/location"
-                                            binaryMessenger:controller];
+                                            binaryMessenger:controller.binaryMessenger];
     
     [channel setMethodCallHandler:^(FlutterMethodCall* call, FlutterResult result) {
         if ([call.method isEqualToString:@"getCurrentLocation"]) {

@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage>
     passwordFocusNode = FocusNode();
     _animationController = AnimationController(
         vsync: this, duration: Duration(milliseconds: 1500));
-    Tween<double> tween = Tween<double>(begin: 1.0, end: 0.2);
+    Tween<double> tween = Tween<double>(begin: 1.0, end: 0.6);
     Animation<double> parentAnimation = tween.animate(_animationController);
     _animation =
         CurvedAnimation(parent: parentAnimation, curve: Curves.elasticInOut);
@@ -238,8 +238,8 @@ class FractionallySizedTrasition extends AnimatedWidget {
     Animation<double> animation = listenable;
     return FractionallySizedBox(
       child: child,
-      widthFactor: animation.value,
-      heightFactor: animation.value,
+      widthFactor: 0.4 * animation.value,
+      heightFactor: 0.4 * animation.value,
     );
   }
 }

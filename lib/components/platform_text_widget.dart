@@ -9,31 +9,20 @@ class PlatformViewTextWidget extends StatelessWidget {
 
   const PlatformViewTextWidget({Key key, this.text}) : super(key: key);
 
-  void _onPlatformViewCreated(int id) {
-    print(id);
-  }
-
   @override
   Widget build(BuildContext context) {
     Widget platformView;
     if (defaultTargetPlatform == TargetPlatform.android) {
       platformView = AndroidView(
-        onPlatformViewCreated: _onPlatformViewCreated,
         viewType: _viewType,
         creationParams: text,
         creationParamsCodec: const StandardMessageCodec(),
       );
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       platformView = UiKitView(
-        onPlatformViewCreated: _onPlatformViewCreated,
         viewType: _viewType,
         creationParams: text,
         creationParamsCodec: const StandardMessageCodec(),
-        gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>[
-          new Factory<OneSequenceGestureRecognizer>(
-                () => new EagerGestureRecognizer(),
-          ),
-        ].toSet(),
       );
     } else {
       platformView = Text('不支持的平台');

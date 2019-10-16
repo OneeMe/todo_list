@@ -162,8 +162,9 @@ class _EditTodoPageState extends State<EditTodoPage> {
                     onSaved: (value) => _todo.location = value,
                   ),
                   onLongPress: () => Navigator.of(context).pushNamed(
-                      LOCATION_DETAIL_PAGE_URL,
-                      arguments: LocationDetailArgument('location')),
+                    LOCATION_DETAIL_PAGE_URL,
+                    arguments: LocationDetailArgument('location'),
+                  ),
                 ),
                 _buildDatePicker(
                   '日期',

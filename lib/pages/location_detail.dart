@@ -16,7 +16,6 @@ class LocationDetailPage extends StatelessWidget {
         centerTitle: true,
       ),
       body: Center(
-//        child: Text(argument.locationString),
         child: SizedBox(
           width: 200,
           height: 200,

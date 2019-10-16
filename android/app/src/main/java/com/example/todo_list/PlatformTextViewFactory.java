@@ -2,7 +2,6 @@ package com.example.todo_list;
 
 import android.content.Context;
 
-import io.flutter.plugin.common.MessageCodec;
 import io.flutter.plugin.common.StandardMessageCodec;
 import io.flutter.plugin.platform.PlatformView;
 import io.flutter.plugin.platform.PlatformViewFactory;
