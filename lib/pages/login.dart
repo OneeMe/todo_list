@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_list/components/image_hero.dart';
+import 'package:todo_list/model/login_status.dart';
 import 'dart:convert';
 
 import 'package:todo_list/pages/route_url.dart';
@@ -25,6 +27,11 @@ class _LoginPageState extends State<LoginPage>
   @override
   void initState() {
     super.initState();
+    LoginStatus.instance().isLoginBefore().then((bool isLoginBefore) {
+      if (isLoginBefore) {
+        Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL);
+      }
+    });
     canLogin = false;
     emailFocusNode = FocusNode();
     passwordFocusNode = FocusNode();
@@ -124,6 +131,7 @@ class _LoginPageState extends State<LoginPage>
         ),
       );
     }
+    await LoginStatus.instance().saveLoginStatus();
     Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL);
   }
 

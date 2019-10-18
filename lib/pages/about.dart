@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/components/image_hero.dart';
+import 'package:todo_list/model/login_status.dart';
 import 'package:todo_list/pages/route_url.dart';
 
 class AboutPage extends StatelessWidget {
@@ -50,8 +51,11 @@ class AboutPage extends StatelessWidget {
                     padding: EdgeInsets.only(
                         left: 24, right: 24, top: 12, bottom: 12),
                     child: FlatButton(
-                      onPressed: () => Navigator.of(context)
-                          .pushReplacementNamed(LOGIN_PAGE_URL),
+                      onPressed: () async {
+                        await LoginStatus.instance().clearStatus();
+                        Navigator.of(context)
+                            .pushReplacementNamed(LOGIN_PAGE_URL);
+                      },
                       color: Colors.red,
                       disabledColor: Colors.red,
                       child: Text(

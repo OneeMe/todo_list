@@ -25,7 +25,7 @@ class _TodoEntryState extends State<TodoEntryPage> {
   void initState() {
     super.initState();
     currentIndex = 0;
-    _todoList = TodoList(generateTodos(100));
+    _todoList = TodoList();
     _tabConfigs = [
       TabConfig(title: '你的清单', page: TodoListPage(todoList: _todoList), imagePath: 'assets/images/lists.png'),
       TabConfig(title: '日历', page: CalendarPage(todoList: _todoList), imagePath: 'assets/images/calendar.png'),

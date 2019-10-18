@@ -19,7 +19,12 @@ class TodoListPageState extends State<TodoListPage> {
 
   void updateData() {
     if (mounted) {
-      setState(() => {});
+      ChangeInfo info = widget.todoList.value;
+      if (info?.type == ChangeInfoType.Insert) {
+        _animatedListKey.currentState.insertItem(info.index);
+      } else if (info?.type == ChangeInfoType.Init) {
+        List.generate(widget.todoList.length, (i) => i).forEach(_animatedListKey.currentState.insertItem);
+      }
     }
   }
 
