@@ -17,6 +17,24 @@ class TodoListPage extends StatefulWidget {
 class TodoListPageState extends State<TodoListPage> {
   final GlobalKey<AnimatedListState> _animatedListKey = GlobalKey<AnimatedListState>();
 
+  void updateData() {
+    if (mounted) {
+      setState(() => {});
+    }
+  }
+
+  @override
+  void initState() {
+    widget.todoList.addListener(updateData);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    widget.todoList.removeListener(updateData);
+    super.dispose();
+  }
+
   void _onFinished(Todo todo, int index) {
     setState(() {
       widget.todoList.finishedAt(todo.id);

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:todo_list/model/todo.dart';
 import 'package:todo_list/model/todo_list.dart';
-import 'package:todo_list/utils/generate_todo.dart';
 
 class CalendarPage extends StatefulWidget {
   CalendarPage({Key key, this.todoList}) : super(key: key);
@@ -17,17 +16,28 @@ class _CalendarPageState extends State<CalendarPage> {
   Map<DateTime, List<Todo>> _date2TodoMap = {};
   List<Todo> _todosToShow = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _initDate2TodoMap();
-    widget.todoList.addListener(() {
+
+  void updateData() {
+    if (mounted) {
       setState(() {
         _todosToShow.clear();
         _date2TodoMap.clear();
         _initDate2TodoMap();
       });
-    });
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.todoList.removeListener(updateData);
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initDate2TodoMap();
+    widget.todoList.addListener(updateData);
   }
 
   @override

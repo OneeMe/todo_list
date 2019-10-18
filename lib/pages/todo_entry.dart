@@ -16,7 +16,7 @@ class TodoEntryPage extends StatefulWidget {
 }
 
 class _TodoEntryState extends State<TodoEntryPage> {
-  // List<Widget> childPages;
+
   int currentIndex;
   List<TabConfig> _tabConfigs;
   TodoList _todoList;

@@ -36,16 +36,26 @@ class _ReporterPageState extends State<ReporterPage> {
 
   int currentMonth = 1;
 
-  @override
-  void initState() {
-    super.initState();
-    _initTodosOfThisMonth();
-    widget.todoList.addListener(() {
+  void updateData() {
+    if (mounted) {
       setState(() {
         _reset();
         _initTodosOfThisMonth();
       });
-    });
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.todoList.removeListener(updateData);
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initTodosOfThisMonth();
+    widget.todoList.addListener(updateData);
   }
 
   void _reset() {
