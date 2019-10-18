@@ -3,7 +3,6 @@ import 'package:http/http.dart';
 import 'package:todo_list/components/image_hero.dart';
 import 'dart:convert';
 
-import 'package:todo_list/pages/register.dart';
 import 'package:todo_list/pages/route_url.dart';
 
 class LoginPage extends StatefulWidget {
@@ -69,52 +68,63 @@ class _LoginPageState extends State<LoginPage>
   }
 
   _login() async {
-    Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL);
-    // String email = _emailController.text;
-    // String password = _passwordController.text;
-    // showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return Dialog(
-    //         child: Padding(
-    //           padding: const EdgeInsets.only(top: 15.0, bottom: 15.0),
-    //           child: Row(
-    //             mainAxisAlignment: MainAxisAlignment.center,
-    //             children: <Widget>[
-    //               CircularProgressIndicator(),
-    //               Text('请求中...'),
-    //             ],
-    //           ),
-    //         ),
-    //       );
-    //     });
-    // Response response = await post('http://10.0.2.2:8989/login',
-    //     body: JsonEncoder().convert({
-    //       'email': email,
-    //       'password': password,
-    //     }),
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     });
-    // Map<String, dynamic> body = JsonDecoder().convert(response.body);
+    String email = _emailController.text;
+    String password = _passwordController.text;
+    if (email.isNotEmpty || password.isNotEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 15.0, bottom: 15.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                  Text('请求中...'),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+      Response response;
+      Map<String, dynamic> body;
+      try {
+        response = await post(
+          'http://10.0.2.2:8989/login',
+          body: JsonEncoder().convert({
+            'email': email,
+            'password': password,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        );
+        body = JsonDecoder().convert(response.body);
+      } catch (e) {
+        body['error'] = '服务器请求失败，请检查网络连接';
+      }
 
-    // Navigator.of(context).pop();
-    // showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) => AlertDialog(
-    //           title: Text('服务器返回信息'),
-    //           content: Text(body['error'].isEmpty
-    //               ? '登录成功'
-    //               : '登录失败，服务器信息为：${body['error']}'),
-    //           actions: <Widget>[
-    //             FlatButton(
-    //               child: Text('确定'),
-    //               onPressed: () {
-    //                 Navigator.of(context).pop();
-    //               },
-    //             )
-    //           ],
-    //         ));
+      Navigator.of(context).pop();
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: Text('服务器返回信息'),
+          content: Text(
+              body['error'].isEmpty ? '登录成功' : '登录失败，服务器信息为：${body['error']}'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('确定'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        ),
+      );
+    }
+    Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL);
   }
 
   @override
