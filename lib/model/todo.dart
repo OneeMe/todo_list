@@ -119,9 +119,9 @@ class Todo {
         PRIORITY: priority.value,
         IS_FINISHED: isFinished ? 1 : 0,
         IS_STAR: isStar ? 1 : 0,
-        LOCATION_LATITUDE: location?.latitude?.toString(),
-        LOCATION_LONGITUDE: location?.latitude?.toString(),
-        LOCATION_DESCRIPTION: location?.description,
+        LOCATION_LATITUDE: location?.latitude?.toString() ?? 0,
+        LOCATION_LONGITUDE: location?.latitude?.toString() ?? 0,
+        LOCATION_DESCRIPTION: location?.description ?? '',
       };
 
   static Todo fromMap(Map<String, dynamic> map) => Todo(
@@ -135,9 +135,9 @@ class Todo {
         isFinished: map[IS_FINISHED] == 1 ? true : false,
         isStar: map[IS_STAR] == 1 ? true : false,
         location: Location(
-          double.parse(map[LOCATION_LONGITUDE]),
-          double.parse(map[LOCATION_LONGITUDE]),
-          map[LOCATION_DESCRIPTION],
+          longitude: double.parse(map[LOCATION_LONGITUDE]),
+          latitude: double.parse(map[LOCATION_LONGITUDE]),
+          description: map[LOCATION_DESCRIPTION],
         ),
       );
 }
@@ -198,12 +198,12 @@ class Location {
   String description;
 
   /// 默认的构造器
-  Location(this.longitude, this.latitude, this.description);
+  Location({this.longitude = 0, this.latitude = 0, this.description = ''});
 
   /// 命名构造器，用于构造只有描述信息的 Location 对象
   Location.fromDescription(this.description)
-      : latitude = null,
-        longitude = null;
+      : latitude = 0,
+        longitude = 0;
 }
 
 class TodoStatus {

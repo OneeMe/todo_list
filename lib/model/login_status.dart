@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-const String PREFRENCE_KEY = 'todo_app_login_flag';
+const String PREFRENCE_KEY = 'todo_app_login_email';
 
 class LoginStatus {
   LoginStatus._();
@@ -25,9 +25,14 @@ class LoginStatus {
     return _sharedPreferences.containsKey(PREFRENCE_KEY);
   }
 
-  Future<void> saveLoginStatus() async {
+  Future<String> loginEmail() async {
     await _initSharedPreferences();
-    await _sharedPreferences.setBool(PREFRENCE_KEY, true);
+    return _sharedPreferences.getString(PREFRENCE_KEY);
+  }
+
+  Future<void> saveLoginStatus(String email) async {
+    await _initSharedPreferences();
+    await _sharedPreferences.setString(PREFRENCE_KEY, email);
   }
 
   Future<void> _initSharedPreferences() async {

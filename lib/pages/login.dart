@@ -151,7 +151,7 @@ class _LoginPageState extends State<LoginPage>
         ),
       );
     }
-    await LoginStatus.instance().saveLoginStatus();
+    await LoginStatus.instance().saveLoginStatus(email);
     Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL);
   }
 

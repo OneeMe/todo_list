@@ -6,6 +6,6 @@ class Channel {
 
   static Future<Location> getCurrentLocation() async {
     Map locationMap = await platform.invokeMethod<Map>('getCurrentLocation');
-    return Location(double.parse(locationMap['latitude']), double.parse(locationMap['longitude']), locationMap['description']);
+    return Location(latitude: double.parse(locationMap['latitude']), longitude: double.parse(locationMap['longitude']), description: locationMap['description']);
   }
 }
