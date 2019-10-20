@@ -94,21 +94,28 @@ class TodoListPageState extends State<TodoListPage> {
     );
   }
 
+  Future<void> _onRefresh() async {
+    await widget.todoList.syncWithNetwork();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AnimatedList(
-      key: _animatedListKey,
-      initialItemCount: widget.todoList.length,
-      itemBuilder: (context, index, animation) {
-        Todo todo = widget.todoList.list[index];
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: Offset(1, 0),
-            end: Offset.zero,
-          ).animate(animation),
-          child: _buildTodo(todo, index),
-        );
-      },
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      child: AnimatedList(
+        key: _animatedListKey,
+        initialItemCount: widget.todoList.length,
+        itemBuilder: (context, index, animation) {
+          Todo todo = widget.todoList.list[index];
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: Offset(1, 0),
+              end: Offset.zero,
+            ).animate(animation),
+            child: _buildTodo(todo, index),
+          );
+        },
+      ),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_list/components/image_hero.dart';
 import 'package:todo_list/model/login_status.dart';
+import 'package:todo_list/model/network_client.dart';
 import 'dart:convert';
 
 import 'package:todo_list/pages/route_url.dart';
@@ -28,9 +29,10 @@ class _LoginPageState extends State<LoginPage>
   @override
   void initState() {
     super.initState();
-    LoginStatus.instance().isLoginBefore().then((bool isLoginBefore) {
+    LoginStatus.instance().isLoginBefore().then((bool isLoginBefore) async {
       if (isLoginBefore) {
-        Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL);
+        String email = await LoginStatus.instance().loginEmail();
+        Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL, arguments: TodoEntryPageArgument(email: email));
       }
     });
     canLogin = false;
@@ -115,31 +117,14 @@ class _LoginPageState extends State<LoginPage>
           );
         },
       );
-      Response response;
-      Map<String, dynamic> body;
-      try {
-        response = await post(
-          'http://10.0.2.2:8989/login',
-          body: JsonEncoder().convert({
-            'email': email,
-            'password': password,
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        );
-        body = JsonDecoder().convert(response.body);
-      } catch (e) {
-        body['error'] = '服务器请求失败，请检查网络连接';
-      }
-
+      String result = await NetworkClient.instance().login(email, password);
       Navigator.of(context).pop();
       showDialog(
         context: context,
         builder: (BuildContext context) => AlertDialog(
           title: Text('服务器返回信息'),
           content: Text(
-              body['error'].isEmpty ? '登录成功' : '登录失败，服务器信息为：${body['error']}'),
+              result.isEmpty ? '登录成功' : '登录失败，服务器信息为：$result'),
           actions: <Widget>[
             FlatButton(
               child: Text('确定'),
@@ -152,7 +137,7 @@ class _LoginPageState extends State<LoginPage>
       );
     }
     await LoginStatus.instance().saveLoginStatus(email);
-    Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL);
+    Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL, arguments: TodoEntryPageArgument(email: email));
   }
 
   @override

@@ -12,6 +12,12 @@ enum OpenType {
   Preview,
 }
 
+class TodoEntryPageArgument {
+  final String email;
+
+  TodoEntryPageArgument({this.email});
+}
+
 class EditTodoPageArgument {
   final OpenType openType;
   final Todo todo;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/config/colors.dart';
+import 'package:todo_list/model/network_client.dart';
 import 'package:todo_list/model/todo.dart';
 import 'package:todo_list/model/todo_list.dart';
 import 'package:todo_list/pages/calendart.dart';
@@ -7,15 +8,16 @@ import 'package:todo_list/pages/reporter.dart';
 import 'package:todo_list/pages/route_url.dart';
 import 'package:todo_list/pages/about.dart';
 import 'package:todo_list/pages/todo_list.dart';
-import 'package:todo_list/utils/generate_todo.dart';
 
 class TodoEntryPage extends StatefulWidget {
-  TodoEntryPage({Key key}) : super(key: key);
+  final TodoEntryPageArgument argument;
+
+  TodoEntryPage({Key key, this.argument}) : super(key: key);
 
   _TodoEntryState createState() => _TodoEntryState();
 }
 
-class _TodoEntryState extends State<TodoEntryPage> {
+class _TodoEntryState extends State<TodoEntryPage> with WidgetsBindingObserver {
 
   int currentIndex;
   List<TabConfig> _tabConfigs;
@@ -24,15 +26,33 @@ class _TodoEntryState extends State<TodoEntryPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     currentIndex = 0;
-    _todoList = TodoList();
+    _todoList = TodoList(widget.argument.email);
     _tabConfigs = [
       TabConfig(title: '你的清单', page: TodoListPage(todoList: _todoList), imagePath: 'assets/images/lists.png'),
       TabConfig(title: '日历', page: CalendarPage(todoList: _todoList), imagePath: 'assets/images/calendar.png'),
       TabConfig(title: '', page: Container(), imagePath: 'assets/images/add.png', size: 50, singleImage: true),
       TabConfig(title: '任务回顾', page: ReporterPage(todoList: _todoList), imagePath: 'assets/images/report.png'),
-      TabConfig(title: '关于', page: AboutPage(), imagePath: 'assets/images/settings.png'),
+      TabConfig(title: '关于', page: AboutPage(todoList: _todoList, email: widget.argument.email), imagePath: 'assets/images/settings.png'),
     ];
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      NetworkClient.instance().uploadList(_todoList.list, widget.argument.email);
+    }
+    if (state == AppLifecycleState.resumed) {
+      _todoList.syncWithNetwork();
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   void onTabChange(int index) async {

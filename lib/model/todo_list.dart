@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:todo_list/model/db_provider.dart';
 import 'package:todo_list/model/login_status.dart';
+import 'package:todo_list/model/network_client.dart';
 import 'package:todo_list/model/todo.dart';
 
 typedef RemovedItemBuilder = Widget Function(
@@ -23,11 +24,12 @@ class ChangeInfo {
 }
 
 class TodoList extends ValueNotifier<ChangeInfo> {
-  TodoList() : super(null) {
+  TodoList(this.email) : super(null) {
     _todoList = [];
     value = ChangeInfo(null, null, ChangeInfoType.Init);
+    _dbProvider = DbProvider(email);
+    _networkProvider = NetworkClient.instance();
     LoginStatus.instance().loginEmail().then((String email) async {
-      _dbProvider = DbProvider(email);
       List<Todo> todos = await _dbProvider.loadFromDataBase();
       if (todos.isNotEmpty) {
         _todoList = todos;
@@ -39,9 +41,19 @@ class TodoList extends ValueNotifier<ChangeInfo> {
 
   List<Todo> _todoList;
   DbProvider _dbProvider;
+  NetworkClient _networkProvider;
+  DateTime _editTime;
+  DateTime get editTime => _editTime;
+  final String email;
 
   int get length => _todoList.length;
   List<Todo> get list => List.unmodifiable(_todoList);
+  
+  @override
+  set value(ChangeInfo info) {
+    _editTime = DateTime.now();
+    super.value = value;
+  }
 
   void _add(Todo todo) {
     _todoList.add(todo);
@@ -63,7 +75,6 @@ class TodoList extends ValueNotifier<ChangeInfo> {
     _todoList.removeAt(index);
     value = ChangeInfo(todo, index, ChangeInfoType.Delete);
     _dbProvider.remove(todo);
-    notifyListeners();
     return index;
   }
 
@@ -110,5 +121,17 @@ class TodoList extends ValueNotifier<ChangeInfo> {
     _add(todo);
     _dbProvider.update(todo);
     return true;
+  }
+
+  Future<void> syncWithNetwork() async {
+    FetchListResult result = await _networkProvider.fetchList(email);
+    if (result.error.isEmpty) {
+      if (_editTime.isAfter(result.timestamp)) {
+        await _networkProvider.uploadList(list, email);
+      } else {
+        _todoList = result.data;
+        value = ChangeInfo(null, null, ChangeInfoType.Init);
+      }
+    }
   }
 }

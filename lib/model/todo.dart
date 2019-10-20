@@ -15,8 +15,11 @@ const String LOCATION_LATITUDE = 'location_latitude';
 const String LOCATION_LONGITUDE = 'location_longitude';
 const String LOCATION_DESCRIPTION = 'location_description';
 
-timeOfDayToString(TimeOfDay timeOfDay) => '${timeOfDay.hour}:${timeOfDay.minute}';
-timeOfDayFromString(String string) => TimeOfDay(hour: int.parse(string.split(':').first), minute: int.parse(string.split(':').last));
+timeOfDayToString(TimeOfDay timeOfDay) =>
+    '${timeOfDay.hour}:${timeOfDay.minute}';
+timeOfDayFromString(String string) => TimeOfDay(
+    hour: int.parse(string.split(':').first),
+    minute: int.parse(string.split(':').last));
 
 class Todo {
   /// ID

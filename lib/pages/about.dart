@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/components/image_hero.dart';
 import 'package:todo_list/model/login_status.dart';
+import 'package:todo_list/model/network_client.dart';
+import 'package:todo_list/model/todo_list.dart';
 import 'package:todo_list/pages/route_url.dart';
 
 class AboutPage extends StatelessWidget {
-  const AboutPage({Key key}) : super(key: key);
+
+  const AboutPage({Key key, this.todoList, this.email}) : super(key: key);
+
+  final TodoList todoList;
+  final String email;
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +59,7 @@ class AboutPage extends StatelessWidget {
                     child: FlatButton(
                       onPressed: () async {
                         await LoginStatus.instance().clearStatus();
+                        await NetworkClient.instance().uploadList(todoList.list, email);
                         Navigator.of(context)
                             .pushReplacementNamed(LOGIN_PAGE_URL);
                       },

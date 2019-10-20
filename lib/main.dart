@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       locale: Locale('zh'),
       initialRoute: LOGIN_PAGE_URL,
       routes: {
-        TODO_ENTRY_PAGE_URL: (_) => TodoEntryPage(),
+        TODO_ENTRY_PAGE_URL: (BuildContext context) => TodoEntryPage(argument: ModalRoute.of(context).settings.arguments),
       },
       onGenerateRoute: (RouteSettings settings) {
         if (settings.name == REGISTER_PAGE_URL) {
