@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_list/model/db_provider.dart';
 import 'package:todo_list/model/login_status.dart';
 import 'package:todo_list/model/network_client.dart';
@@ -23,18 +24,22 @@ class ChangeInfo {
   ChangeInfo(this.todo, this.index, this.type);
 }
 
+const String EDIT_TIME_KEY = 'todo_list_edit_timestamp';
+
 class TodoList extends ValueNotifier<ChangeInfo> {
   TodoList(this.email) : super(null) {
     _todoList = [];
-    value = ChangeInfo(null, null, ChangeInfoType.Init);
     _dbProvider = DbProvider(email);
     _networkProvider = NetworkClient.instance();
-    LoginStatus.instance().loginEmail().then((String email) async {
-      List<Todo> todos = await _dbProvider.loadFromDataBase();
+    _dbProvider.loadFromDataBase().then((List<Todo> todos) async {
       if (todos.isNotEmpty) {
         _todoList = todos;
         _sort();
-        notifyListeners();
+        value = ChangeInfo(null, null, ChangeInfoType.Init);
+        SharedPreferences instance = await SharedPreferences.getInstance();
+        if (_editTime == null && instance.containsKey(EDIT_TIME_KEY)) {
+          _editTime = DateTime.fromMillisecondsSinceEpoch(instance.getInt(EDIT_TIME_KEY));
+        }
       }
     });
   }
@@ -48,10 +53,13 @@ class TodoList extends ValueNotifier<ChangeInfo> {
 
   int get length => _todoList.length;
   List<Todo> get list => List.unmodifiable(_todoList);
-  
+
   @override
   set value(ChangeInfo info) {
-    _editTime = DateTime.now();
+    if (info.type != ChangeInfoType.Init) {
+      _editTime = DateTime.now();
+      SharedPreferences.getInstance().then((SharedPreferences instance) => instance.setInt(EDIT_TIME_KEY, _editTime.millisecondsSinceEpoch));
+    }
     super.value = value;
   }
 
