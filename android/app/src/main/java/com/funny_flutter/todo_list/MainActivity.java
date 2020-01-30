@@ -1,26 +1,25 @@
-package com.example.todo_list;
+package com.funny_flutter.todo_list;
 
-import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 
 import java.util.HashMap;
 
-import io.flutter.app.FlutterActivity;
+import io.flutter.embedding.android.FlutterActivity;
+import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugins.GeneratedPluginRegistrant;
 
 public class MainActivity extends FlutterActivity {
     // 此处的名字要和 dart 侧的一致
-    private static final String CHANNEL = "todo_list.example.io/location";
+    private static final String CHANNEL = "com.funny_flutter.todo_list.channel";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        PlatformTextViewFactory factory = new PlatformTextViewFactory();
-        registrarFor("com.funny.flutter.platform.view").platformViewRegistry().registerViewFactory("platform_text_view", factory);
-        GeneratedPluginRegistrant.registerWith(this);
+    public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
+        GeneratedPluginRegistrant.registerWith(flutterEngine);
         // 新建一个 MethodChannel 对象
-        new MethodChannel(getFlutterView(), CHANNEL).setMethodCallHandler((MethodCall call, MethodChannel.Result result) -> {
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler((MethodCall call, MethodChannel.Result result) -> {
                 // 当收到名为 getCurrentLocation 的方法调用时，返回getCurrentLocation()函数的结果
                 if (call.method.equals("getCurrentLocation")) {
                     result.success(getCurrentPosition());
@@ -29,6 +28,9 @@ public class MainActivity extends FlutterActivity {
                 }
             }
         );
+        // 注册 platform text view
+        PlatformTextViewFactory factory = new PlatformTextViewFactory();
+        flutterEngine.getPlatformViewsController().getRegistry().registerViewFactory("platform_text_view", factory);
     }
 
     public HashMap getCurrentPosition() {

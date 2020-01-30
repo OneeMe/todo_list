@@ -9,7 +9,7 @@
     FlutterViewController* controller = (FlutterViewController*)self.window.rootViewController;
     
     FlutterMethodChannel* channel = [FlutterMethodChannel
-                                            methodChannelWithName:@"todo_list.example.io/location"
+                                            methodChannelWithName:@"com.funny_flutter.todo_list.channel"
                                             binaryMessenger:controller.binaryMessenger];
     
     [channel setMethodCallHandler:^(FlutterMethodCall* call, FlutterResult result) {
@@ -24,7 +24,7 @@
         }
     }];
     PlatformViewFactory *factory = [[PlatformViewFactory alloc] init];
-    [[self registrarForPlugin:@"com.funny.flutter.platform.view"] registerViewFactory:factory withId:@"platform_text_view"];
+    [[self registrarForPlugin:@"com.funny_flutter.todo_list.view"] registerViewFactory:factory withId:@"platform_text_view"];
   [GeneratedPluginRegistrant registerWithRegistry:self];
   // Override point for customization after application launch.
   return [super application:application didFinishLaunchingWithOptions:launchOptions];

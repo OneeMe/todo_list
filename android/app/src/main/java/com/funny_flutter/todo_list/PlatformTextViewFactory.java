@@ -1,4 +1,4 @@
-package com.example.todo_list;
+package com.funny_flutter.todo_list;
 
 import android.content.Context;
 
@@ -8,7 +8,7 @@ import io.flutter.plugin.platform.PlatformViewFactory;
 
 public class PlatformTextViewFactory extends PlatformViewFactory {
 
-    public PlatformTextViewFactory() {
+    PlatformTextViewFactory() {
         super(StandardMessageCodec.INSTANCE);
     }
 

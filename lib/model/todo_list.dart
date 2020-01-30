@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_list/model/db_provider.dart';
-import 'package:todo_list/model/login_status.dart';
 import 'package:todo_list/model/network_client.dart';
 import 'package:todo_list/model/todo.dart';
 

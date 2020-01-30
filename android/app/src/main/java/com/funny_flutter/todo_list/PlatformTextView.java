@@ -1,4 +1,4 @@
-package com.example.todo_list;
+package com.funny_flutter.todo_list;
 
 import android.content.Context;
 import android.view.View;

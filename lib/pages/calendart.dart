@@ -15,6 +15,7 @@ class CalendarPage extends StatefulWidget {
 class _CalendarPageState extends State<CalendarPage> {
   Map<DateTime, List<Todo>> _date2TodoMap = {};
   List<Todo> _todosToShow = [];
+  CalendarController calendarController;
 
 
   void updateData() {
@@ -30,12 +31,14 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   void dispose() {
     widget.todoList.removeListener(updateData);
+    calendarController.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
+    calendarController = CalendarController();
     _initDate2TodoMap();
     widget.todoList.addListener(updateData);
   }
@@ -45,6 +48,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Column(
       children: <Widget>[
         TableCalendar(
+          calendarController: calendarController,
           locale: 'zh_CN',
           events: _date2TodoMap,
           headerStyle: HeaderStyle(),
