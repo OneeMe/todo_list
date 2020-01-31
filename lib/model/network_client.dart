@@ -43,7 +43,7 @@ class NetworkClient {
   }
 
   Future<String> uploadList(List<Todo> list, String email) async {
-    Map result;
+    Map result = {};
     try {
       Response response = await post(
         '$baseUrl/list',

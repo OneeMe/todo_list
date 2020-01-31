@@ -59,7 +59,7 @@ class TodoList extends ValueNotifier<ChangeInfo> {
       _editTime = DateTime.now();
       SharedPreferences.getInstance().then((SharedPreferences instance) => instance.setInt(EDIT_TIME_KEY, _editTime.millisecondsSinceEpoch));
     }
-    super.value = value;
+    super.value = info;
   }
 
   void _add(Todo todo) {
