@@ -32,7 +32,8 @@ class _LoginPageState extends State<LoginPage>
     LoginStatus.instance().isLoginBefore().then((bool isLoginBefore) async {
       if (isLoginBefore) {
         String email = await LoginStatus.instance().loginEmail();
-        Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL, arguments: TodoEntryPageArgument(email: email));
+        Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL,
+            arguments: TodoEntryPageArgument(email: email));
       }
     });
     canLogin = false;
@@ -78,25 +79,26 @@ class _LoginPageState extends State<LoginPage>
   }
 
   _login() async {
-  ConnectivityResult connectivityResult = await (Connectivity().checkConnectivity());
-  if (connectivityResult == ConnectivityResult.none) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: Text('请求失败'),
-        content: Text('设备尚未连入网络'),
-        actions: <Widget>[
-          FlatButton(
-            child: Text('确定'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          )
-        ],
-      ),
-    );
-    return;
-  }
+    ConnectivityResult connectivityResult =
+        await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: Text('请求失败'),
+          content: Text('设备尚未连入网络'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('确定'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        ),
+      );
+      return;
+    }
     String email = _emailController.text;
     String password = _passwordController.text;
     if (email.isNotEmpty || password.isNotEmpty) {
@@ -123,8 +125,7 @@ class _LoginPageState extends State<LoginPage>
         context: context,
         builder: (BuildContext context) => AlertDialog(
           title: Text('服务器返回信息'),
-          content: Text(
-              result.isEmpty ? '登录成功' : '登录失败，服务器信息为：$result'),
+          content: Text(result.isEmpty ? '登录成功' : '登录失败，服务器信息为：$result'),
           actions: <Widget>[
             FlatButton(
               child: Text('确定'),
@@ -137,7 +138,8 @@ class _LoginPageState extends State<LoginPage>
       );
     }
     await LoginStatus.instance().saveLoginStatus(email);
-    Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL, arguments: TodoEntryPageArgument(email: email));
+    Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL,
+        arguments: TodoEntryPageArgument(email: email));
   }
 
   @override
