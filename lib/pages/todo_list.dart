@@ -57,7 +57,7 @@ class TodoListPageState extends State<TodoListPage> {
     if (changedTodo == null) {
       return;
     }
-    widget.todoList.updateTodo(todo.id, todo);
+    widget.todoList.updateTodo(changedTodo.id, changedTodo);
   }
 
   void _onLongPress(Todo todo, int index) async {

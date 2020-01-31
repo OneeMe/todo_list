@@ -51,7 +51,7 @@ class TodoList extends ValueNotifier<ChangeInfo> {
   final String email;
 
   int get length => _todoList.length;
-  List<Todo> get list => List.unmodifiable(_todoList);
+  List<Todo> get list => List.from(_todoList);
 
   @override
   set value(ChangeInfo info) {

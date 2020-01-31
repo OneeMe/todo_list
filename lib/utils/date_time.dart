@@ -26,3 +26,7 @@ DateTime today() {
   DateTime now = DateTime.now();
   return DateTime(now.year, now.month, now.day);
 }
+
+extension DateTimeUtils on DateTime {
+  DateTime get nowDay => DateTime(year, month, day);
+}

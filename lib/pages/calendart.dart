@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:todo_list/model/todo.dart';
 import 'package:todo_list/model/todo_list.dart';
+import 'package:todo_list/pages/route_url.dart';
+import 'package:todo_list/utils/date_time.dart';
 
 class CalendarPage extends StatefulWidget {
   CalendarPage({Key key, this.todoList}) : super(key: key);
@@ -16,7 +18,7 @@ class _CalendarPageState extends State<CalendarPage> {
   Map<DateTime, List<Todo>> _date2TodoMap = {};
   List<Todo> _todosToShow = [];
   CalendarController calendarController;
-
+  DateTime _initDay;
 
   void updateData() {
     if (mounted) {
@@ -39,8 +41,19 @@ class _CalendarPageState extends State<CalendarPage> {
   void initState() {
     super.initState();
     calendarController = CalendarController();
+    _initDay = today();
     _initDate2TodoMap();
     widget.todoList.addListener(updateData);
+  }
+
+  void _onTap(Todo todo) async {
+    Todo changedTodo = await Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL,
+        arguments:
+            EditTodoPageArgument(openType: OpenType.Preview, todo: todo));
+    if (changedTodo == null) {
+      return;
+    }
+    widget.todoList.updateTodo(changedTodo.id, changedTodo);
   }
 
   @override
@@ -56,6 +69,7 @@ class _CalendarPageState extends State<CalendarPage> {
             todayColor: Colors.transparent,
             todayStyle: TextStyle(color: Colors.black),
           ),
+          initialSelectedDay: _initDay,
           onDaySelected: (DateTime day, List events) {
             this.setState(() {
               _todosToShow = events.cast<Todo>();
@@ -74,6 +88,7 @@ class _CalendarPageState extends State<CalendarPage> {
       _date2TodoMap.putIfAbsent(todo.date, () => []);
       _date2TodoMap[todo.date].add(todo);
     });
+    _todosToShow.addAll(_date2TodoMap[_initDay] ?? []);
   }
 
   Widget _buildTaskListArea() {
@@ -81,39 +96,42 @@ class _CalendarPageState extends State<CalendarPage> {
       itemCount: _todosToShow.length,
       itemBuilder: (context, index) {
         Todo todo = _todosToShow[index];
-        return Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Container(
-                  color: todo.status.color,
-                  height: 10,
-                  width: 10,
-                  margin: EdgeInsets.all(10),
-                ),
-                Text(todo.title),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-              child: Row(
+        return GestureDetector(
+          onTap: () => _onTap(todo),
+          child: Column(
+            children: <Widget>[
+              Row(
                 children: <Widget>[
-                  Icon(
-                    Icons.access_time,
-                    size: 15,
-                    color: Color(0xffb9b9bc),
+                  Container(
+                    color: todo.status.color,
+                    height: 10,
+                    width: 10,
+                    margin: EdgeInsets.all(10),
                   ),
-                  Text(' ${todo.startTime.hour} - ${todo.endTime.hour}',
-                      style: TextStyle(color: Color(0xffb9b9bc))),
+                  Text(todo.title),
                 ],
               ),
-            ),
-            Container(
-              height: 1,
-              color: Color(0xffececed),
-              margin: EdgeInsets.fromLTRB(0, 20, 0, 20),
-            )
-          ],
+              Padding(
+                padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.access_time,
+                      size: 15,
+                      color: Color(0xffb9b9bc),
+                    ),
+                    Text(' ${todo.startTime.hour} - ${todo.endTime.hour}',
+                        style: TextStyle(color: Color(0xffb9b9bc))),
+                  ],
+                ),
+              ),
+              Container(
+                height: 1,
+                color: Color(0xffececed),
+                margin: EdgeInsets.fromLTRB(0, 20, 0, 20),
+              )
+            ],
+          ),
         );
       },
     );

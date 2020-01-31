@@ -171,7 +171,7 @@ class _EditTodoPageState extends State<EditTodoPage> {
                   '请选择日期',
                   dateController: _dateController,
                   textController: _dateTextController,
-                  onSaved: (value) => _todo.date = value,
+                  onSaved: (value) => _todo.date = value.nowDay,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

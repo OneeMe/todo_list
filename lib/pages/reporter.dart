@@ -3,6 +3,7 @@ import 'package:todo_list/components/empty_widget.dart';
 import 'package:todo_list/components/scroll_option_view.dart';
 import 'package:todo_list/model/todo.dart';
 import 'package:todo_list/model/todo_list.dart';
+import 'package:todo_list/pages/route_url.dart';
 
 final List<String> months = [
   '1月',
@@ -149,44 +150,55 @@ class _ReporterPageState extends State<ReporterPage> {
     );
   }
 
+  void _onTap(Todo todo) async {
+    Todo changedTodo = await Navigator.of(context).pushNamed(EDIT_TODO_PAGE_URL, arguments: EditTodoPageArgument(openType: OpenType.Preview, todo: todo));
+    if (changedTodo == null) {
+      return;
+    }
+    widget.todoList.updateTodo(changedTodo.id, changedTodo);
+  }
+
   Widget _buildTodoListArea() {
     return ListView.builder(
       itemCount: _todosOfThisMonth.length,
       itemBuilder: (context, index) {
         Todo todo = _todosOfThisMonth[index];
-        return Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Container(
-                  color: todo.status.color,
-                  height: 10,
-                  width: 10,
-                  margin: EdgeInsets.all(10),
-                ),
-                Text(todo.title),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-              child: Row(
+        return GestureDetector(
+          onTap: () => _onTap(todo),
+          child: Column(
+            children: <Widget>[
+              Row(
                 children: <Widget>[
-                  Icon(
-                    Icons.access_time,
-                    size: 15,
-                    color: Color(0xffb9b9bc),
+                  Container(
+                    color: todo.status.color,
+                    height: 10,
+                    width: 10,
+                    margin: EdgeInsets.all(10),
                   ),
-                  Text(' ${todo.startTime.hour} - ${todo.endTime.hour}',
-                      style: TextStyle(color: Color(0xffb9b9bc))),
+                  Text(todo.title),
                 ],
               ),
-            ),
-            Container(
-              height: 1,
-              color: Color(0xffececed),
-              margin: EdgeInsets.fromLTRB(0, 20, 0, 20),
-            )
-          ],
+              Padding(
+                padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.access_time,
+                      size: 15,
+                      color: Color(0xffb9b9bc),
+                    ),
+                    Text(' ${todo.startTime.hour} - ${todo.endTime.hour}',
+                        style: TextStyle(color: Color(0xffb9b9bc))),
+                  ],
+                ),
+              ),
+              Container(
+                height: 1,
+                color: Color(0xffececed),
+                margin: EdgeInsets.fromLTRB(0, 20, 0, 20),
+              )
+            ],
+          ),
         );
       },
     );
