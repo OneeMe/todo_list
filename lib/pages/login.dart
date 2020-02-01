@@ -1,4 +1,5 @@
 import 'package:connectivity/connectivity.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +9,7 @@ import 'package:todo_list/model/network_client.dart';
 import 'dart:convert';
 
 import 'package:todo_list/pages/route_url.dart';
+import 'package:todo_list/utils/network.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -16,6 +18,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
+  bool isMock;   
   bool canLogin;
 
   TextEditingController _emailController = TextEditingController();
@@ -36,6 +39,7 @@ class _LoginPageState extends State<LoginPage>
             arguments: TodoEntryPageArgument(email: email));
       }
     });
+    isMock = true;
     canLogin = false;
     emailFocusNode = FocusNode();
     passwordFocusNode = FocusNode();
@@ -79,67 +83,73 @@ class _LoginPageState extends State<LoginPage>
   }
 
   _login() async {
-    ConnectivityResult connectivityResult =
-        await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.none) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: Text('请求失败'),
-          content: Text('设备尚未连入网络'),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('确定'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            )
-          ],
-        ),
-      );
+    if (await checkConnectivityResult(context) == false) {
       return;
     }
     String email = _emailController.text;
     String password = _passwordController.text;
     if (email.isNotEmpty || password.isNotEmpty) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 15.0, bottom: 15.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  CircularProgressIndicator(),
-                  Text('请求中...'),
-                ],
+      if (isMock) {
+        if (!(email == 'example@icloud.com' && password == '1234567')) {
+          _showErrorDialog('用户名或密码不正确');
+          return;
+        }
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 15.0, bottom: 15.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    CircularProgressIndicator(),
+                    Text('请求中...'),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
-      );
-      String result = await NetworkClient.instance().login(email, password);
-      Navigator.of(context).pop();
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: Text('服务器返回信息'),
-          content: Text(result.isEmpty ? '登录成功' : '登录失败，服务器信息为：$result'),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('确定'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            )
-          ],
-        ),
-      );
+            );
+          },
+        );
+        String result = await NetworkClient.instance().login(email, password);
+        Navigator.of(context).pop();
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: Text('服务器返回信息'),
+            content: Text(result.isEmpty ? '登录成功' : '登录失败，服务器信息为：$result'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('确定'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          ),
+        );
+      }
     }
     await LoginStatus.instance().saveLoginStatus(email);
     Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL,
         arguments: TodoEntryPageArgument(email: email));
+  }
+
+  void _showErrorDialog(String message) {
+    showCupertinoDialog(
+      builder: (_) => AlertDialog(
+        title: Text('输入错误'),
+        content: Text(message),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('确认'),
+            onPressed: () => Navigator.of(context).pop(),
+          )
+        ],
+      ),
+      context: context,
+    );
   }
 
   @override

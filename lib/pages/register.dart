@@ -1,34 +1,72 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:todo_list/pages/route_url.dart';
-
+import 'package:todo_list/utils/network.dart';
 
 class RegisterPage extends StatefulWidget {
-
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  bool canRegister;
   File image;
   FocusNode emailFocusNode;
   FocusNode passwordFocusNode;
   FocusNode confirmPasswordFocusNode;
+  TextEditingController emailController;
+  TextEditingController passwordController;
+  TextEditingController confirmPasswordController;
 
   @override
   void initState() {
     super.initState();
-    canRegister = true;
     emailFocusNode = FocusNode();
     passwordFocusNode = FocusNode();
     confirmPasswordFocusNode = FocusNode();
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
+    confirmPasswordController = TextEditingController();
   }
 
-  void _register() {
-    Navigator.of(context).pushNamed(TODO_ENTRY_PAGE_URL);
+  void _register() async {
+    if (await checkConnectivityResult(context) == false) {
+      return;
+    }
+    String email = emailController.text;
+    String password = passwordController.text;
+    String confirmPassword = confirmPasswordController.text;
+    if (email.isEmpty || !email.contains('@')) {
+      _showErrorDialog('请输入正确的邮箱');
+      return;
+    }
+    if (password.length < 6) {
+      _showErrorDialog('请输入正确的密码');
+      return;
+    }
+    if (confirmPassword.length < 6 || confirmPassword != password) {
+      _showErrorDialog('请输入正确的确认密码');
+      return;
+    }
+    Navigator.of(context).pushReplacementNamed(TODO_ENTRY_PAGE_URL, arguments: TodoEntryPageArgument(email: email));
+  }
+
+  void _showErrorDialog(String message) {
+    showCupertinoDialog(
+      builder: (_) => AlertDialog(
+        title: Text('输入错误'),
+        content: Text(message),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('确认'),
+            onPressed: () => Navigator.of(context).pop(),
+          )
+        ],
+      ),
+      context: context,
+    );
   }
 
   void _getImage() async {
@@ -109,38 +147,56 @@ class _RegisterPageState extends State<RegisterPage> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
                             TextField(
+                              controller: emailController,
                               decoration: InputDecoration(
                                 hintText: '请输入邮箱',
                                 labelText: '邮箱',
                               ),
+                              focusNode: emailFocusNode,
                               keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
-                              onSubmitted: (String value) {},
+                              onSubmitted: (String value) {
+                                emailFocusNode.unfocus();
+                                FocusScope.of(context).requestFocus(passwordFocusNode);
+                              },
                             ),
                             TextField(
+                              controller: passwordController,
                               decoration: InputDecoration(
                                 hintText: '请输入六位以上的密码',
                                 labelText: '密码',
                               ),
+                              focusNode: passwordFocusNode,
                               obscureText: true,
                               textInputAction: TextInputAction.next,
+                              onSubmitted: (String value) {
+                                passwordFocusNode.unfocus();
+                                FocusScope.of(context).requestFocus(confirmPasswordFocusNode);
+                              },
                             ),
                             TextField(
+                              controller: confirmPasswordController,
                               decoration: InputDecoration(
                                 hintText: '请再次输入密码',
                                 labelText: '确认密码',
                               ),
+                              focusNode: confirmPasswordFocusNode,
                               obscureText: true,
                               textInputAction: TextInputAction.done,
+                              onSubmitted: (_) => _register(),
                             ),
                           ],
                         ),
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            left: 24, right: 24, top: 12, bottom: 12),
+                          left: 24,
+                          right: 24,
+                          top: 12,
+                          bottom: 12,
+                        ),
                         child: FlatButton(
-                          onPressed: canRegister ? _register : null,
+                          onPressed: _register,
                           color: Color.fromRGBO(69, 202, 181, 1),
                           disabledColor: Color.fromRGBO(69, 202, 160, 0.5),
                           child: Text(
@@ -153,7 +209,11 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            left: 24, right: 24, top: 12, bottom: 12),
+                          left: 24,
+                          right: 24,
+                          top: 12,
+                          bottom: 12,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
@@ -161,7 +221,8 @@ class _RegisterPageState extends State<RegisterPage> {
                             InkWell(
                               child: Text('直接登录'),
                               onTap: () {
-                                Navigator.of(context).pushReplacementNamed(LOGIN_PAGE_URL);
+                                Navigator.of(context)
+                                    .pushReplacementNamed(LOGIN_PAGE_URL);
                               },
                             ),
                           ],
