@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_list/config/colors.dart';
 import 'package:todo_list/model/network_client.dart';
 import 'package:todo_list/model/todo.dart';
@@ -30,7 +31,7 @@ class _TodoEntryState extends State<TodoEntryPage> with WidgetsBindingObserver {
     currentIndex = 0;
     _todoList = TodoList(widget.argument.email);
     _tabConfigs = [
-      TabConfig(title: '你的清单', page: TodoListPage(todoList: _todoList), imagePath: 'assets/images/lists.png'),
+      TabConfig(title: '你的清单', page: TodoListPage(), imagePath: 'assets/images/lists.png'),
       TabConfig(title: '日历', page: CalendarPage(todoList: _todoList), imagePath: 'assets/images/calendar.png'),
       TabConfig(title: '', page: Container(), imagePath: 'assets/images/add.png', size: 50, singleImage: true),
       TabConfig(title: '任务回顾', page: ReporterPage(todoList: _todoList), imagePath: 'assets/images/report.png'),
@@ -77,9 +78,12 @@ class _TodoEntryState extends State<TodoEntryPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       body: IndexedStack(
-         index: currentIndex,
-         children: _tabConfigs.map((config) => config.page).toList()
+       body: ChangeNotifierProvider<TodoList>.value(
+         value: _todoList,
+          child: IndexedStack(
+          index: currentIndex,
+          children: _tabConfigs.map((config) => config.page).toList()
+        ),
        ),
       //  body: childPages[currentIndex],
        appBar: AppBar(
