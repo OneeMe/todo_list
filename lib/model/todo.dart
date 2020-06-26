@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:todo_list/utils/date_time.dart';
 import 'package:uuid/uuid.dart';
+
+part 'todo.g.dart';
 
 const String ID = 'id';
 const String TITLE = 'title';
@@ -15,12 +18,12 @@ const String LOCATION_LATITUDE = 'location_latitude';
 const String LOCATION_LONGITUDE = 'location_longitude';
 const String LOCATION_DESCRIPTION = 'location_description';
 
-timeOfDayToString(TimeOfDay timeOfDay) =>
-    '${timeOfDay.hour}:${timeOfDay.minute}';
-timeOfDayFromString(String string) => TimeOfDay(
-    hour: int.parse(string.split(':').first),
-    minute: int.parse(string.split(':').last));
+timeOfDayToString(TimeOfDay timeOfDay) => '${timeOfDay.hour}:${timeOfDay.minute}';
+timeOfDayFromString(String string) =>
+    TimeOfDay(hour: int.parse(string.split(':').first), minute: int.parse(string.split(':').last));
 
+/// 这个标注告诉生成器，该类是需要生成 model 的类
+@JsonSerializable(checked: true)
 class Todo {
   /// ID
   final String id;
@@ -32,42 +35,115 @@ class Todo {
   String description;
 
   /// 日期
+  @JsonKey(fromJson: _dateFromJSON, toJson: _dateToJSON)
   DateTime date;
 
   /// 开始时间
-  TimeOfDay startTime;
+//  TimeOfDay startTime;
+  @JsonKey(name: 'startTime')
+  String _startTime;
+
+  @JsonKey(ignore: true)
+  TimeOfDay get startTime => timeOfDayFromString(_startTime);
+  @JsonKey(ignore: true)
+  set startTime(TimeOfDay startTime) {
+    _startTime = '${startTime.hour}:${startTime.minute}';
+  }
 
   /// 结束时间
-  TimeOfDay endTime;
+  @JsonKey(name: 'endTime')
+  String _endTime;
+
+  @JsonKey(ignore: true)
+  TimeOfDay get endTime => timeOfDayFromString(_endTime);
+  @JsonKey(ignore: true)
+  set endTime(TimeOfDay endTime) {
+    _endTime = '${endTime.hour}:${endTime.minute}';
+  }
 
   /// 优先级
+  @JsonKey(fromJson: _priortyFromJSON, toJson: _priorityToJSON)
   Priority priority;
 
   /// 是否完成
+  @JsonKey(fromJson: _boolFromJSON, toJson: _boolToJSON, nullable: false)
   bool isFinished;
 
   /// 是否星标任务
+  @JsonKey(fromJson: _boolFromJSON, toJson: _boolToJSON, nullable: false)
   bool isStar;
 
   /// 和 todo 所关联的地点
-  Location location;
+  @JsonKey(name: 'location_longitude')
+  String _location_longitude;
+
+  @JsonKey(name: 'location_latitude')
+  String _location_latitude;
+
+  @JsonKey(name: 'location_description')
+  String _location_description;
+
+  @JsonKey(ignore: true)
+  Location get location => Location(
+        longitude: double.tryParse(_location_longitude),
+        latitude: double.tryParse(_location_latitude),
+        description: _location_description,
+      );
+
+  @JsonKey(ignore: true)
+  set location(Location location) {
+    _location_latitude = '${location.latitude}';
+    _location_longitude = '${location.longitude}';
+    _location_description = '${location.description}';
+  }
 
   Todo({
     String id,
     this.title = "",
     this.description = "",
     this.date,
-    this.startTime = const TimeOfDay(hour: 0, minute: 0),
-    this.endTime = const TimeOfDay(hour: 0, minute: 0),
+    TimeOfDay startTime = const TimeOfDay(hour: 0, minute: 0),
+    TimeOfDay endTime = const TimeOfDay(hour: 0, minute: 0),
     this.priority = Priority.Unspecific, // 优先级越小优先级越高
     this.isFinished = false,
     this.isStar = false,
-    this.location,
-  }) : this.id = id ?? generateNewId() {
+    Location location,
+  })  : this.id = id ?? generateNewId(),
+        _startTime = '${startTime.hour}:${startTime.minute}',
+        _endTime = '${endTime.hour}:${endTime.minute}',
+        _location_latitude = '${location?.latitude}',
+        _location_longitude = '${location?.longitude}' {
     // 如果开始时间为空，则设置为当前时间
     if (date == null) {
       date = today();
     }
+  }
+
+  static DateTime _dateFromJSON(String date) {
+    return DateTime.fromMillisecondsSinceEpoch(int.parse(date));
+  }
+
+  static String _dateToJSON(DateTime dateTime) {
+    return '${dateTime.millisecondsSinceEpoch}';
+  }
+
+  static Priority _priortyFromJSON(int priority) {
+    return Priority.values.firstWhere((p) => p.value == priority);
+  }
+
+  static String _priorityToJSON(Priority priority) {
+    return '${priority.value}';
+  }
+
+  static bool _boolFromJSON(int boolVal) {
+    if (boolVal == null) {
+      return false;
+    }
+    return boolVal == 1;
+  }
+
+  static String _boolToJSON(bool val) {
+    return val == true ? '1' : '0';
   }
 
   static Uuid _uuid = Uuid();
@@ -127,22 +203,7 @@ class Todo {
         LOCATION_DESCRIPTION: location?.description ?? '',
       };
 
-  static Todo fromMap(Map<String, dynamic> map) => Todo(
-        id: map[ID],
-        title: map[TITLE],
-        description: map[DESCRIPTION],
-        date: DateTime.fromMillisecondsSinceEpoch(int.parse(map[DATE])),
-        startTime: timeOfDayFromString(map[START_TIME]),
-        endTime: timeOfDayFromString(map[END_TIME]),
-        priority: Priority.values.firstWhere((p) => p.value == map[PRIORITY]),
-        isFinished: map[IS_FINISHED] == 1 ? true : false,
-        isStar: map[IS_STAR] == 1 ? true : false,
-        location: Location(
-          longitude: double.parse(map[LOCATION_LONGITUDE]),
-          latitude: double.parse(map[LOCATION_LONGITUDE]),
-          description: map[LOCATION_DESCRIPTION],
-        ),
-      );
+  static Todo fromMap(Map<String, dynamic> json) => _$TodoFromJson(json);
 }
 
 class Priority {
@@ -161,8 +222,7 @@ class Priority {
   /// 如果两个 Priority 对象的 value 相等，则它们相等；
   /// 如果一个 Priority 对象的 value 和一个整型值相等，则它们相等
   @override
-  bool operator ==(other) =>
-      other is Priority && other.value == value || other == value;
+  bool operator ==(other) => other is Priority && other.value == value || other == value;
 
   /// 重载==运算符必须同时重载 hashCode
   @override
@@ -173,8 +233,7 @@ class Priority {
   bool isHigher(Priority other) => other != null && other.value < value;
 
   /// 支持用整型值创建 Priority 对象
-  factory Priority(int priority) =>
-      values.firstWhere((e) => e.value == priority, orElse: () => Low);
+  factory Priority(int priority) => values.firstWhere((e) => e.value == priority, orElse: () => Low);
 
   /// 下面定义了允许用户使用的4个枚举值
   static const Priority High = Priority._(0, '高优先级', Color(0xFFE53B3B));
@@ -225,8 +284,7 @@ class TodoStatus {
   /// 如果两个 Priority 对象的 value 相等，则它们相等；
   /// 如果一个 Priority 对象的 value 和一个整型值相等，则它们相等
   @override
-  bool operator ==(other) =>
-      other is TodoStatus && other.value == value || other == value;
+  bool operator ==(other) => other is TodoStatus && other.value == value || other == value;
 
   /// 重载 == 运算符必须同时重载 hashCode
   @override
@@ -237,16 +295,12 @@ class TodoStatus {
   bool isFinished() => this == TodoStatus.finished;
 
   /// 支持用整型值创建 TaskStatus 对象
-  factory TodoStatus(int status) =>
-      values.firstWhere((e) => e.value == status, orElse: () => unspecified);
+  factory TodoStatus(int status) => values.firstWhere((e) => e.value == status, orElse: () => unspecified);
 
   /// 下面定义了允许用户使用的4个枚举值
-  static const TodoStatus unspecified =
-      TodoStatus._(0, '未安排', const Color(0xff8c88ff));
-  static const TodoStatus finished =
-      TodoStatus._(1, '已完成', const Color(0xff51d2c2));
-  static const TodoStatus delay =
-      TodoStatus._(2, '已延期', const Color(0xffffb258));
+  static const TodoStatus unspecified = TodoStatus._(0, '未安排', const Color(0xff8c88ff));
+  static const TodoStatus finished = TodoStatus._(1, '已完成', const Color(0xff51d2c2));
+  static const TodoStatus delay = TodoStatus._(2, '已延期', const Color(0xffffb258));
 
   static const List<TodoStatus> values = [
     unspecified,
